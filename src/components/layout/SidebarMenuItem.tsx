@@ -6,14 +6,19 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Box,
 } from '@mui/material';
-import Image from 'next/image';
+import SvgIconWrapper from '@/components/icons/SvgIconWrapper';
 
 export interface SidebarMenuItemProps {
   label: string;
   path: string;
-  icon: React.ReactNode | string; // Can be React component or SVG path string
+  /**
+   * Icon can be:
+   * - SVG component: import DashboardIcon from "@/assets/icons/dashboard-icon.svg"
+   * - String path: "/images/icons/dashboard-icon.svg"
+   * - Material-UI icon: <DashboardIcon />
+   */
+  icon: React.ReactNode | React.ComponentType<React.SVGProps<SVGSVGElement>> | string;
   isActive: boolean;
   onClick: (path: string) => void;
   variant?: 'default' | 'logout';
@@ -33,12 +38,17 @@ export default function SidebarMenuItem({
 }: SidebarMenuItemProps) {
   const isLogout = variant === 'logout';
 
-  // Determine if icon is a string path (SVG) or React component
-  const isSvgIcon = typeof icon === 'string';
+  // Check if icon is a string path, SVG component, or React element
+  const isStringPath = typeof icon === 'string';
+  const isSvgComponent = typeof icon === 'function' && !React.isValidElement(icon);
+  const isReactElement = React.isValidElement(icon);
 
   const handleClick = () => {
     onClick(path);
   };
+
+  // Icon color: black when not selected, white when selected (for non-logout items)
+  const iconColor = isLogout ? '#E1000F' : isActive ? '#FFFFFF' : '#000000';
 
   return (
     <ListItem disablePadding sx={{ mb: 0.5 }}>
@@ -59,36 +69,28 @@ export default function SidebarMenuItem({
               : 'rgba(217, 181, 161, 0.1)',
           },
           '& .MuiListItemIcon-root': {
-            color: isLogout ? '#E1000F' : isActive ? '#FFFFFF' : '#364153',
+            color: iconColor,
             minWidth: 40,
           },
         }}
       >
         <ListItemIcon>
-          {isSvgIcon ? (
-            <Box
+          {isStringPath ? (
+            <SvgIconWrapper 
+              src={icon as string} 
+              size={24}
               sx={{
-                width: 24,
-                height: 24,
-                position: 'relative',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                color: iconColor,
               }}
-            >
-              <Image
-                src={icon}
-                alt={`${label} icon`}
-                width={24}
-                height={24}
-                style={{
-                  objectFit: 'contain',
-                  width: '100%',
-                  height: '100%',
-                }}
-                unoptimized
-              />
-            </Box>
+            />
+          ) : isSvgComponent ? (
+            <SvgIconWrapper
+              src={icon as React.ComponentType<React.SVGProps<SVGSVGElement>>}
+              sx={{
+                color: iconColor,
+                fontSize: '1.5rem',
+              }}
+            />
           ) : (
             icon
           )}

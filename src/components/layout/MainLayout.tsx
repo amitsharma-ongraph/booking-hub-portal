@@ -26,7 +26,8 @@ export default function MainLayout({ children }: MainLayoutProps) {
           flexGrow: 1,
           display: 'flex',
           flexDirection: 'column',
-          minHeight: '100vh',
+          height: '100vh',
+          overflow: 'hidden',
           backgroundColor: 'background.default',
         }}
       >
@@ -35,7 +36,14 @@ export default function MainLayout({ children }: MainLayoutProps) {
         <Box
           sx={{
             flexGrow: 1,
+            overflowY: 'auto',
+            overflowX: 'hidden',
             p: { xs: 2, sm: 3, md: 4 },
+            // Hide scrollbar
+            scrollbarWidth: 'none', // Firefox
+            '&::-webkit-scrollbar': {
+              display: 'none', // Chrome, Safari, Edge
+            },
           }}
         >
           {children}

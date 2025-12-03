@@ -34,15 +34,16 @@ const menuItems: Omit<SidebarMenuItemProps, 'isActive' | 'onClick'>[] = [
     path: '/bookings',
   },
   { 
-    label: 'Categories', 
-    icon: '/images/icons/categories-icon.svg', // Replace with actual SVG path
-    path: '/categories',
-  },
-  { 
     label: 'Calendar', 
     icon: '/images/icons/calendar-icon.svg', // Replace with actual SVG path
     path: '/calendar',
   },
+  { 
+    label: 'Categories', 
+    icon: '/images/icons/categories-icon.svg', // Replace with actual SVG path
+    path: '/categories',
+  },
+
 ];
 
 const logoutItem: Omit<SidebarMenuItemProps, 'isActive' | 'onClick'> = {
