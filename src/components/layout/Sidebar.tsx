@@ -4,43 +4,53 @@ import React from 'react';
 import {
   Drawer,
   List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   Box,
-  Typography,
-  Divider,
   useTheme,
   useMediaQuery,
 } from '@mui/material';
-import {
-  Dashboard as DashboardIcon,
-  CalendarMonth as CalendarIcon,
-  Category as CategoryIcon,
-  BookOnline as BookingsIcon,
-  Person as PersonIcon,
-  Info as InfoIcon,
-  Star as StarIcon,
-} from '@mui/icons-material';
+import Image from 'next/image';
+import { Logout as LogoutIcon } from '@mui/icons-material';
 import { usePathname, useRouter } from 'next/navigation';
+import SidebarMenuItem, { SidebarMenuItemProps } from './SidebarMenuItem';
 
-const drawerWidth = 260;
+const drawerWidth = 285; // Match SVG width
 
 interface SidebarProps {
   mobileOpen: boolean;
   onClose: () => void;
 }
 
-const menuItems = [
-  { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
-  { text: 'Bookings', icon: <BookingsIcon />, path: '/bookings' },
-  { text: 'Categories', icon: <CategoryIcon />, path: '/categories' },
-  { text: 'Calendar', icon: <CalendarIcon />, path: '/calendar' },
-  { text: 'Ratings', icon: <StarIcon />, path: '/ratings' },
-  { text: 'Profile', icon: <PersonIcon />, path: '/profile' },
-  { text: 'About', icon: <InfoIcon />, path: '/about' },
+// Menu items configuration - can use either Material-UI icons or SVG paths
+// For now using placeholder paths - replace with actual SVG paths from Figma
+const menuItems: Omit<SidebarMenuItemProps, 'isActive' | 'onClick'>[] = [
+  { 
+    label: 'Dashboard', 
+    icon: '/images/icons/dashboard-icon.svg', // Replace with actual SVG path
+    path: '/',
+  },
+  { 
+    label: 'Bookings', 
+    icon: '/images/icons/bookings-icon.svg', // Replace with actual SVG path
+    path: '/bookings',
+  },
+  { 
+    label: 'Categories', 
+    icon: '/images/icons/categories-icon.svg', // Replace with actual SVG path
+    path: '/categories',
+  },
+  { 
+    label: 'Calendar', 
+    icon: '/images/icons/calendar-icon.svg', // Replace with actual SVG path
+    path: '/calendar',
+  },
 ];
+
+const logoutItem: Omit<SidebarMenuItemProps, 'isActive' | 'onClick'> = {
+  label: 'Logout',
+  icon: <LogoutIcon />, // Using Material-UI icon for logout
+  path: '/login',
+  variant: 'logout',
+};
 
 export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
   const theme = useTheme();
@@ -56,85 +66,95 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
   };
 
   const drawer = (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* Logo/Brand */}
+    <Box
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: '#FFFFFF',
+      }}
+    >
+      {/* Logo/Brand - Height: 80px */}
       <Box
         sx={{
-          p: 3,
+          height: '80px',
           display: 'flex',
           alignItems: 'center',
-          gap: 1.5,
+          justifyContent: 'center',
         }}
       >
         <Box
           sx={{
             width: 40,
             height: 40,
-            borderRadius: 2,
-            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            fontWeight: 700,
-            fontSize: '1.25rem',
+            position: 'relative',
           }}
         >
-          BH
+          <Image
+            src="/images/login/logo.svg"
+            alt="Booking Hub Logo"
+            width={40}
+            height={40}
+            style={{
+              objectFit: 'contain',
+              width: '100%',
+              height: '100%',
+            }}
+            priority
+            unoptimized
+          />
         </Box>
-        <Typography variant="h6" fontWeight={700} color="primary">
-          Booking Hub
-        </Typography>
       </Box>
 
-      <Divider />
+      {/* Divider */}
+      <Box
+        sx={{
+          height: '1px',
+          backgroundColor: '#E5E7EB',
+          width: '100%',
+        }}
+      />
 
       {/* Navigation Menu */}
-      <List sx={{ flex: 1, px: 2, py: 2 }}>
-        {menuItems.map((item) => {
-          const isActive = pathname === item.path;
-          return (
-            <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
-              <ListItemButton
-                onClick={() => handleNavigation(item.path)}
-                sx={{
-                  borderRadius: 2,
-                  py: 1.5,
-                  backgroundColor: isActive ? 'primary.main' : 'transparent',
-                  color: isActive ? 'white' : 'text.primary',
-                  '&:hover': {
-                    backgroundColor: isActive
-                      ? 'primary.dark'
-                      : 'action.hover',
-                  },
-                  '& .MuiListItemIcon-root': {
-                    color: isActive ? 'white' : 'text.secondary',
-                  },
-                }}
-              >
-                <ListItemIcon sx={{ minWidth: 40 }}>
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.text}
-                  primaryTypographyProps={{
-                    fontWeight: isActive ? 600 : 500,
-                    fontSize: '0.9375rem',
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
+      <List
+        sx={{
+          flex: 1,
+          px: 2.25, // ~18px
+          py: 2,
+          overflow: 'auto',
+        }}
+      >
+        {menuItems.map((item) => (
+          <SidebarMenuItem
+            key={item.path}
+            label={item.label}
+            path={item.path}
+            icon={item.icon}
+            isActive={pathname === item.path}
+            onClick={handleNavigation}
+            variant={item.variant || 'default'}
+          />
+        ))}
       </List>
 
-      <Divider />
-
-      {/* Footer */}
-      <Box sx={{ p: 2 }}>
-        <Typography variant="caption" color="text.secondary">
-          © 2024 Booking Hub
-        </Typography>
+      {/* Footer Section with Logout */}
+      <Box
+        sx={{
+          borderTop: '1px solid #E5E7EB',
+          pt: 2,
+          pb: 2,
+        }}
+      >
+        <List sx={{ px: 2.25 }}>
+          <SidebarMenuItem
+            label={logoutItem.label}
+            path={logoutItem.path}
+            icon={logoutItem.icon}
+            isActive={false}
+            onClick={handleNavigation}
+            variant={logoutItem.variant}
+          />
+        </List>
       </Box>
     </Box>
   );
@@ -157,6 +177,8 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
           '& .MuiDrawer-paper': {
             boxSizing: 'border-box',
             width: drawerWidth,
+            backgroundColor: '#FFFFFF',
+            borderRight: '1px solid #E5E7EB',
           },
         }}
       >
@@ -171,8 +193,8 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
           '& .MuiDrawer-paper': {
             boxSizing: 'border-box',
             width: drawerWidth,
-            borderRight: '1px solid',
-            borderColor: 'divider',
+            borderRight: '1px solid #E5E7EB',
+            backgroundColor: '#FFFFFF',
           },
         }}
         open

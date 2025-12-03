@@ -7,7 +7,6 @@ import {
   IconButton,
   Typography,
   Box,
-  Avatar,
   Menu,
   MenuItem,
   Badge,
@@ -16,10 +15,10 @@ import {
 } from '@mui/material';
 import {
   Menu as MenuIcon,
-  Notifications as NotificationsIcon,
-  Search as SearchIcon,
+  NotificationsOutlined as NotificationsIcon,
   AccountCircle,
 } from '@mui/icons-material';
+import Image from 'next/image';
 import { mockUser } from '@/data/mockData';
 
 interface TopBarProps {
@@ -39,65 +38,137 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
     setAnchorEl(null);
   };
 
+  // User name from SVG design
+  const userName = 'Arwa Khalifa';
+
   return (
     <AppBar
       position="sticky"
       elevation={0}
       sx={{
-        backgroundColor: 'background.paper',
-        borderBottom: '1px solid',
-        borderColor: 'divider',
-        color: 'text.primary',
+        backgroundColor: '#FFFFFF',
+        borderBottom: '1px solid #E5E7EB',
+        color: '#101828',
+        height: '80px',
       }}
     >
-      <Toolbar sx={{ gap: 2 }}>
+      <Toolbar
+        sx={{
+          height: '100%',
+          px: { xs: 2, sm: 3 },
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
         {/* Mobile menu button */}
         <IconButton
           color="inherit"
           edge="start"
           onClick={onMenuClick}
-          sx={{ display: { md: 'none' } }}
+          sx={{
+            display: { md: 'none' },
+            color: '#101828',
+          }}
         >
           <MenuIcon />
         </IconButton>
 
-        {/* Page title or search */}
-        <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-          {!isMobile && (
-            <Typography variant="h6" fontWeight={600} color="text.primary">
-              Welcome back, {mockUser.name.split(' ')[0]}!
-            </Typography>
-          )}
-        </Box>
+        {/* Spacer for desktop */}
+        <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'block' } }} />
 
-        {/* Search icon */}
-        <IconButton color="inherit" size="large">
-          <SearchIcon />
-        </IconButton>
-
-        {/* Notifications */}
-        <IconButton color="inherit" size="large">
-          <Badge badgeContent={3} color="error">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-
-        {/* User menu */}
-        <IconButton
-          onClick={handleMenu}
-          size="small"
-          sx={{ ml: 1 }}
+        {/* Right side group: Notifications + User Avatar and Name */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            ml: 'auto',
+          }}
         >
-          <Avatar
+          {/* Notifications */}
+          <IconButton
+            color="inherit"
             sx={{
-              width: 36,
-              height: 36,
-              bgcolor: 'primary.main',
+              color: '#4A5565',
+              p: 1,
             }}
           >
-            {mockUser.name.charAt(0)}
-          </Avatar>
-        </IconButton>
+            <Badge
+              variant="dot"
+              sx={{
+                '& .MuiBadge-badge': {
+                  backgroundColor: '#E57373',
+                  right: 4,
+                  top: 4,
+                },
+              }}
+            >
+              <NotificationsIcon sx={{ fontSize: '1.5rem' }} />
+            </Badge>
+          </IconButton>
+
+          {/* Account Name and Number */}
+          <Box
+            sx={{
+              display: { xs: 'none', md: 'flex' },
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              gap: 0.25,
+            }}
+          >
+            <Typography
+              variant="body1"
+              sx={{
+                color: '#101828',
+                fontSize: '0.875rem',
+                fontWeight: 400,
+                lineHeight: 1.5,
+              }}
+            >
+              {userName}
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{
+                color: '#808080',
+                fontSize: '0.75rem',
+                fontWeight: 400,
+                lineHeight: 1.5,
+              }}
+            >
+              Account #123456789
+            </Typography>
+          </Box>
+
+          {/* User Avatar */}
+          <Box
+            sx={{
+              cursor: 'pointer',
+              width: '44.5131px',
+              height: '44.5131px',
+              position: 'relative',
+              borderRadius: '50%',
+              overflow: 'hidden',
+              flexShrink: 0,
+            }}
+            onClick={handleMenu}
+          >
+            <Image
+              src="/images/avatar.svg"
+              alt="User Avatar"
+              width={44.5131}
+              height={44.5131}
+              style={{
+                objectFit: 'cover',
+                width: '100%',
+                height: '100%',
+              }}
+              priority
+              unoptimized
+            />
+          </Box>
+        </Box>
 
         <Menu
           anchorEl={anchorEl}
