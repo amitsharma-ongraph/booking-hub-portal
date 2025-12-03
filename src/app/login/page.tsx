@@ -196,7 +196,7 @@ export default function LoginPage() {
                 >
                   Don't have an account?{' '}
                   <Link
-                    href="/signup"
+                    href="/register"
                     sx={{
                       color: '#A3B899', // Exact green color from SVG
                       textDecoration: 'none',

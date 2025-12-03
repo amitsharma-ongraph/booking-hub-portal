@@ -3,6 +3,9 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SplashScreen from '@/components/onboarding/SplashScreen';
+import FirstOnboardingScreen from '@/components/onboarding/FirstOnboardingScreen';
+import SecondOnboardingScreen from '@/components/onboarding/SecondOnboardingScreen';
+import ThirdOnboardingScreen from '@/components/onboarding/ThirdOnboardingScreen';
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -13,24 +16,38 @@ export default function OnboardingPage() {
     setShowSplash(false);
   };
 
-  const handleNext = () => {
-    // TODO: Navigate to next onboarding screen
-    // For now, redirect to dashboard when all screens are done
-    // setCurrentScreen((prev) => prev + 1);
-    router.push('/');
-  };
-
   const handleSkip = () => {
-    // Skip entire onboarding and go to dashboard
     router.push('/');
   };
 
-  // Show splash screen first
+  const handleNext = () => {
+    // 0 -> first onboarding screen
+    // 1 -> second onboarding screen
+    // 2 -> third onboarding screen
+    if (currentScreen === 0) {
+      setCurrentScreen(1);
+      return;
+    }
+    if (currentScreen === 1) {
+      setCurrentScreen(2);
+      return;
+    }
+    // After third screen, go to app
+    router.push('/');
+  };
+
   if (showSplash) {
     return <SplashScreen onComplete={handleSplashComplete} />;
   }
 
-  // Onboarding screens will be added here
-  // Each screen will be a component similar to SplashScreen
-  return null;
+  if (currentScreen === 0) {
+    return <FirstOnboardingScreen onNext={handleNext} onSkip={handleSkip} />;
+  }
+
+  if (currentScreen === 1) {
+    return <SecondOnboardingScreen onNext={handleNext} onSkip={handleSkip} />;
+  }
+
+  return <ThirdOnboardingScreen onNext={handleNext} onSkip={handleSkip} />;
 }
+

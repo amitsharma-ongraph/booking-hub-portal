@@ -92,19 +92,35 @@ export default function AuthPageLayout({ children, cardHeight }: AuthPageLayoutP
         />
       </Box>
 
-      {/* Auth Card - Centered on all screens */}
+      {/* Auth Card - Responsive dimensions: 585px width at 1440px, 750px height at 1024px */}
       <Card
         sx={{
           position: 'relative',
           zIndex: 1,
-          width: { xs: 'calc(100% - 32px)', sm: 585 },
-          maxWidth: { xs: 'calc(100% - 32px)', sm: 585 },
-          height: cardHeight || { xs: 'auto', sm: 'auto' },
+          // Width: 585px at 1440px viewport = ~40.6%, responsive for different sizes
+          width: { 
+            xs: 'calc(100% - 32px)', 
+            sm: 'min(585px, calc(100% - 48px))',
+            md: 'min(585px, 40.625vw)', // 585/1440 = 40.625%
+            lg: 585 
+          },
+          maxWidth: 585,
+          // Height: 750px at 1024px viewport = ~73.2%, responsive for different sizes
+          height: cardHeight || { 
+            xs: 'auto',
+            sm: 'min(750px, 73.24vh)', // 750/1024 = 73.24%
+            md: 'min(750px, 73.24vh)',
+            lg: 750
+          },
           borderRadius: { xs: 3, sm: '30px' },
           boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.08)',
           backgroundColor: '#FFFFFF',
           p: { xs: 3, sm: 4, md: '36.5px' },
-          // Centered via flexbox parent on all screen sizes
+          // Center children content within the card
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         {children}
