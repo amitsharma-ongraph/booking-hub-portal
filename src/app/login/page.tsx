@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Box,
   Typography,
-  TextField,
-  Button,
   Grid,
   Link,
   Alert,
@@ -16,24 +14,36 @@ import {
   Phone as PhoneIcon,
 } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import AuthPageLayout from '@/components/auth/AuthPageLayout';
+import FormTextField from '@/components/forms/FormTextField';
+import FormButton from '@/components/forms/FormButton';
+import { loginSchema, type LoginFormData } from '@/lib/validations/schemas';
 
 export default function LoginPage() {
   const router = useRouter();
   const theme = useTheme();
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Basic validation
-    if (!phoneNumber) {
-      setError('Please enter your phone number');
-      return;
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      phoneNumber: '',
+    },
+  });
+
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      // TODO: Implement actual login logic
+      // await loginAPI(data);
+      router.push('/otp');
+    } catch (error) {
+      console.error('Login error:', error);
     }
-    // TODO: Implement actual login logic
-    // Redirect to OTP confirmation page
-    router.push('/otp');
   };
 
   return (
@@ -65,83 +75,28 @@ export default function LoginPage() {
           Login
         </Typography>
 
-        {error && (
-          <Alert 
-            severity="error" 
-            sx={{ 
-              mb: 3,
-              borderRadius: 2,
-              width: '100%',
-            }}
-          >
-            {error}
-          </Alert>
-        )}
-
-        <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
+          sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+        >
           <Grid container spacing={2.5}>
-            {/* Phone Number Label */}
-            <Grid size={{ xs: 12 }}>
-              <Typography
-                variant="body1"
-                sx={{
-                  color: theme.palette.custom.label.default,
-                  fontWeight: 400,
-                  mb: 1.5,
-                  fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
-                  lineHeight: 1.5,
-                }}
-              >
-                Phone Number
-              </Typography>
-            </Grid>
-
             {/* Phone Number Input */}
             <Grid size={{ xs: 12 }}>
-              <TextField
-                fullWidth
+              <FormTextField
+                name="phoneNumber"
+                control={control}
+                label="Phone Number"
                 type="tel"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
                 placeholder="Input your phone number"
-                required
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: '7.5px',
-                    backgroundColor: theme.palette.custom.background.white,
-                    height: { xs: '44px', sm: '44px', md: '44px' },
-                    fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
-                    '& fieldset': {
-                      borderColor: theme.palette.custom.border.default,
-                      borderWidth: '1px',
-                    },
-                    '&:hover fieldset': {
-                      borderColor: theme.palette.custom.border.hover,
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: theme.palette.custom.border.focus,
-                      borderWidth: '1.5px',
-                    },
-                  },
-                  '& .MuiInputBase-input': {
-                    color: theme.palette.custom.heading.primary,
-                    py: { xs: 1.25, sm: 1.5 },
-                    px: 1,
-                    '&::placeholder': {
-                      color: theme.palette.custom.label.default,
-                      opacity: 1,
-                      fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
-                    },
-                  },
-                }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start" sx={{ ml: 1 }}>
-                      <PhoneIcon 
-                        sx={{ 
-                          color: theme.palette.custom.label.default, 
-                          fontSize: { xs: '1.125rem', sm: '1.25rem', md: '1.375rem' } 
-                        }} 
+                      <PhoneIcon
+                        sx={{
+                          color: theme.palette.custom.label.default,
+                          fontSize: { xs: '1.125rem', sm: '1.25rem', md: '1.375rem' },
+                        }}
                       />
                     </InputAdornment>
                   ),
@@ -151,28 +106,16 @@ export default function LoginPage() {
 
             {/* Sign In Button */}
             <Grid size={{ xs: 12 }}>
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{
-                  height: { xs: '44px', sm: '41px', md: '41px' },
-                  borderRadius: '10px',
-                  textTransform: 'none',
-                  fontSize: { xs: '0.9375rem', sm: '1rem', md: '1.0625rem' },
-                  fontWeight: 700,
-                  mt: { xs: 0.5, sm: 1 },
-                }}
-              >
+              <FormButton disabled={isSubmitting} sx={{ mt: { xs: 0.5, sm: 1 } }}>
                 Sign In
-              </Button>
+              </FormButton>
             </Grid>
 
             {/* Sign Up Link */}
             <Grid size={{ xs: 12 }}>
-              <Box 
-                sx={{ 
-                  textAlign: 'center', 
+              <Box
+                sx={{
+                  textAlign: 'center',
                   mt: { xs: 2, sm: 2.5, md: 3 },
                 }}
               >
@@ -187,12 +130,7 @@ export default function LoginPage() {
                   }}
                 >
                   Don't have an account?{' '}
-                  <Link
-                    href="/register"
-                    sx={{
-                      fontSize: 'inherit',
-                    }}
-                  >
+                  <Link href="/register" sx={{ fontSize: 'inherit' }}>
                     Sign Up
                   </Link>
                 </Typography>

@@ -1,45 +1,61 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
-  TextField,
-  Button,
   Grid,
   Link,
-  Alert,
   IconButton,
   useTheme,
 } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import AuthPageLayout from '@/components/auth/AuthPageLayout';
+import FormTextField from '@/components/forms/FormTextField';
+import FormButton from '@/components/forms/FormButton';
+import OtpInput from '@/components/forms/OtpInput';
+import {
+  otpMethodSchema,
+  otpVerificationSchema,
+  type OtpMethodFormData,
+  type OtpVerificationFormData,
+} from '@/lib/validations/schemas';
+
+const MOCK_VALID_OTP = '1234';
 
 export default function OTPPage() {
   const router = useRouter();
   const theme = useTheme();
-  const MOCK_VALID_OTP = '1234';
-
-  const [otp, setOtp] = useState(['', '', '', '']);
-  const [error, setError] = useState('');
   const [step, setStep] = useState<'method' | 'otp'>('method');
-  const [selectedMethod, setSelectedMethod] = useState<'sms' | 'email'>('email');
-  const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [timer, setTimer] = useState(60); // 60 seconds countdown
+  const [timer, setTimer] = useState(60);
   const [canResend, setCanResend] = useState(false);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [contactInfo, setContactInfo] = useState<string>('');
 
-  // Auto-focus first input when we enter OTP step
-  useEffect(() => {
-    if (step === 'otp') {
-      inputRefs.current[0]?.focus();
-    }
-  }, [step]);
+  // Method selection form
+  const methodForm = useForm<OtpMethodFormData>({
+    resolver: zodResolver(otpMethodSchema),
+    defaultValues: {
+      method: 'email',
+      email: '',
+      phoneNumber: '',
+    },
+  });
 
+  // OTP verification form
+  const otpForm = useForm<OtpVerificationFormData>({
+    resolver: zodResolver(otpVerificationSchema),
+    defaultValues: {
+      otp: '',
+    },
+  });
+
+  const selectedMethod = methodForm.watch('method');
+
+  // Timer countdown
   useEffect(() => {
-    // Timer countdown (only when in OTP step)
     if (step === 'otp' && timer > 0 && !canResend) {
       const interval = setInterval(() => {
         setTimer((prev) => {
@@ -54,101 +70,54 @@ export default function OTPPage() {
     }
   }, [timer, canResend, step]);
 
-  const handleChange = (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^0-9]/g, ''); // Only allow numbers
-    if (value.length > 1) return; // Only allow single digit
-
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-    setError('');
-
-    // Auto-focus next input
-    if (value && index < 3) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleKeyDown = (index: number) => (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Handle backspace
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 4);
-    const newOtp = [...otp];
-    for (let i = 0; i < 4; i++) {
-      newOtp[i] = pastedData[i] || '';
-    }
-    setOtp(newOtp);
-    // Focus the last filled input or the last input
-    const lastFilledIndex = Math.min(pastedData.length - 1, 3);
-    inputRefs.current[lastFilledIndex]?.focus();
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    // Step 1: choose delivery method (SMS or Email)
-    if (step === 'method') {
-      // Validate input based on selected method
-      if (selectedMethod === 'email') {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!email || !emailRegex.test(email)) {
-          setError('Please enter a valid email address');
-          return;
-        }
-      } else {
-        if (!phoneNumber || phoneNumber.trim().length < 10) {
-          setError('Please enter a valid phone number');
-          return;
-        }
-      }
-      
-      // In real app, trigger send-OTP API here based on selectedMethod
-      setOtp(['', '', '', '']);
+  const onMethodSubmit = async (data: OtpMethodFormData) => {
+    try {
+      // TODO: Implement actual send-OTP API
+      // await sendOTPAPI(data);
+      setContactInfo(data.method === 'email' ? data.email || '' : data.phoneNumber || '');
+      setStep('otp');
       setTimer(60);
       setCanResend(false);
-      setStep('otp');
-      return;
+      otpForm.reset({ otp: '' });
+    } catch (error) {
+      console.error('Send OTP error:', error);
     }
+  };
 
-    // Step 2: verify OTP
-    const otpValue = otp.join('');
-    
-    if (otpValue.length !== 4) {
-      setError('Please enter the complete 4-digit OTP code');
-      return;
-    }
-
-    // Mock OTP verification flow using local constant
-    if (otpValue === MOCK_VALID_OTP) {
-      // For now, redirect to dashboard
-      router.push('/');
-    } else {
-      setError('Incorrect OTP Code');
+  const onOtpSubmit = async (data: OtpVerificationFormData) => {
+    try {
+      // Mock OTP verification
+      if (data.otp === MOCK_VALID_OTP) {
+        router.push('/');
+      } else {
+        otpForm.setError('otp', {
+          type: 'manual',
+          message: 'Incorrect OTP Code',
+        });
+      }
+    } catch (error) {
+      console.error('OTP verification error:', error);
     }
   };
 
   const handleResend = () => {
     if (!canResend) return;
-    
-    setOtp(['', '', '', '']);
-    setError('');
+    otpForm.reset({ otp: '' });
     setTimer(60);
     setCanResend(false);
-    inputRefs.current[0]?.focus();
-    
     // TODO: Implement actual resend OTP logic
+  };
+
+  const handleBack = () => {
+    if (step === 'otp') {
+      setStep('method');
+      otpForm.reset();
+    }
   };
 
   const renderRadio = (value: 'email' | 'sms', label: string) => (
     <Box
-      onClick={() => setSelectedMethod(value)}
+      onClick={() => methodForm.setValue('method', value)}
       sx={{
         display: 'flex',
         alignItems: 'center',
@@ -156,7 +125,6 @@ export default function OTPPage() {
         gap: 1,
         cursor: 'pointer',
         userSelect: 'none',
-
       }}
     >
       <Box
@@ -164,11 +132,14 @@ export default function OTPPage() {
           width: 15,
           height: 15,
           borderRadius: '50%',
-          border: `1px solid ${selectedMethod === value ? theme.palette.primary.main : theme.palette.custom.border.radio}`,
+          border: `1px solid ${
+            selectedMethod === value
+              ? theme.palette.primary.main
+              : theme.palette.custom.border.radio
+          }`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          
         }}
       >
         {selectedMethod === value && (
@@ -205,20 +176,18 @@ export default function OTPPage() {
           position: 'relative',
         }}
       >
-        {/* Back Button - Absolutely positioned at left, aligned with title, near card edge */}
-        <IconButton 
-          onClick={() => {
-            if (step === 'otp') {
-              setStep('method');
-              setError('');
-            }
-          }}
+        {/* Back Button */}
+        <IconButton
+          onClick={handleBack}
           disabled={step === 'method'}
-          sx={{ 
+          sx={{
             position: 'absolute',
-            left: { xs: '-48px', sm: '-56px', md: '-64px' }, // Position near card edge accounting for 80% width + padding
+            left: { xs: '-48px', sm: '-56px', md: '-64px' },
             top: 0,
-            color: step === 'method' ? theme.palette.custom.status.disabled : theme.palette.custom.heading.medium,
+            color:
+              step === 'method'
+                ? theme.palette.custom.status.disabled
+                : theme.palette.custom.heading.medium,
             p: 0.5,
             zIndex: 1,
             cursor: step === 'method' ? 'not-allowed' : 'pointer',
@@ -230,7 +199,7 @@ export default function OTPPage() {
           <ArrowBack sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }} />
         </IconButton>
 
-        {/* OTP Heading - Centered */}
+        {/* OTP Heading */}
         <Typography
           variant="h4"
           sx={{
@@ -247,14 +216,13 @@ export default function OTPPage() {
           OTP Verification
         </Typography>
 
-        {/* Icon badge from Figma (loaded from public/images/otp/otp-badge.svg) */}
+        {/* Icon badge */}
         <Box
           sx={{
             mb: { xs: 3, sm: 3.5, md: 4 },
             display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-            
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           <Box
@@ -284,7 +252,8 @@ export default function OTPPage() {
               px: { xs: 1, sm: 2 },
             }}
           >
-            Please choose how you would like to receive your OTP and enter your contact information.
+            Please choose how you would like to receive your OTP and enter your contact
+            information.
           </Typography>
         ) : (
           <Typography
@@ -299,206 +268,149 @@ export default function OTPPage() {
               width: '100%',
             }}
           >
-            {selectedMethod === 'email' 
+            {selectedMethod === 'email'
               ? `Please check the OTP code sent to your email `
-              : `Please enter the OTP code sent to your phone `
-            }
-            <Box component="span" sx={{ color: '#333333', fontWeight: 400 }}>
-              {selectedMethod === 'email' ? email : phoneNumber}
+              : `Please enter the OTP code sent to your phone `}
+            <Box component="span" sx={{ color: theme.palette.custom.heading.medium, fontWeight: 400 }}>
+              {contactInfo}
             </Box>
           </Typography>
         )}
 
+        {/* Method Selection Form */}
+        {step === 'method' && (
+          <Box component="form" onSubmit={methodForm.handleSubmit(onMethodSubmit)} sx={{ width: '100%' }}>
+            <Grid container spacing={2.5}>
+              {/* Delivery method choice */}
+              <Grid size={{ xs: 12 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: { xs: 3, sm: 4, md: 5 },
+                    mb: { xs: 3, sm: 4, md: 5 },
+                  }}
+                >
+                  {renderRadio('email', 'Email')}
+                  {renderRadio('sms', 'SMS')}
+                </Box>
+              </Grid>
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
-          <Grid container spacing={2.5}>
-            {step === 'method' ? (
-              <>
-                {/* Delivery method choice row - matches Frame 628470 */}
-                <Grid size={{ xs: 12 }}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: { xs: 3, sm: 4, md: 5 },
-                      mb: { xs: 3, sm: 4, md: 5 },
-                    }}
-                  >
-                    {renderRadio('email', 'Email')}
-                    {renderRadio('sms', 'SMS')}
-                  </Box>
-                </Grid>
-
-                {/* Contact Information Input */}
-                <Grid size={{ xs: 12 }}>
-                  {selectedMethod === 'email' ? (
-                    <TextField
-                      type="email"
-                      label="Email Address"
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                        setError('');
-                      }}
-                      fullWidth
-                      required
-                      sx={{
-                        mb: { xs: 4, sm: 5, md: 6 },
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: '10px',
-                          backgroundColor: theme.palette.custom.background.white,
-                          '& fieldset': {
-                            borderColor: theme.palette.custom.border.default,
-                            borderWidth: '1px',
-                          },
-                          '&:hover fieldset': {
-                            borderColor: theme.palette.custom.border.hover,
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: theme.palette.custom.border.focus,
-                            borderWidth: '1.5px',
-                          },
-                        },
-                        '& .MuiInputBase-input': {
-                          color: theme.palette.custom.heading.primary,
-                          fontSize: { xs: '0.9375rem', sm: '1rem', md: '1.0625rem' },
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: theme.palette.custom.label.default,
-                          fontSize: { xs: '0.9375rem', sm: '1rem', md: '1.0625rem' },
-                        },
-                      }}
-                    />
-                  ) : (
-                    <TextField
-                      type="tel"
-                      label="Phone Number"
-                      value={phoneNumber}
-                      onChange={(e) => {
-                        setPhoneNumber(e.target.value);
-                        setError('');
-                      }}
-                      fullWidth
-                      required
-                      sx={{
-                        mb: { xs: 4, sm: 5, md: 6 },
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: '10px',
-                          backgroundColor: theme.palette.custom.background.white,
-                          '& fieldset': {
-                            borderColor: theme.palette.custom.border.default,
-                            borderWidth: '1px',
-                          },
-                          '&:hover fieldset': {
-                            borderColor: theme.palette.custom.border.hover,
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: theme.palette.custom.border.focus,
-                            borderWidth: '1.5px',
-                          },
-                        },
-                        '& .MuiInputBase-input': {
-                          color: theme.palette.custom.heading.primary,
-                          fontSize: { xs: '0.9375rem', sm: '1rem', md: '1.0625rem' },
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: theme.palette.custom.label.default,
-                          fontSize: { xs: '0.9375rem', sm: '1rem', md: '1.0625rem' },
-                        },
-                      }}
-                    />
-                  )}
-                </Grid>
-              </>
-            ) : (
-              <>
-                {/* OTP Input Fields */}
-                <Grid size={{ xs: 12 }}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-                      
-                      gap: { xs: 1, sm: 1.5, md: 2 },
-                      mb: { xs: 3, sm: 4 },
-                    }}
-                  >
-                    {otp.map((digit, index) => (
-                      <TextField
-                        key={index}
-                        inputRef={(el) => {
-                          inputRefs.current[index] = el;
-                        }}
-                        value={digit}
-                        onChange={handleChange(index)}
-                        onKeyDown={handleKeyDown(index)}
-                        onPaste={index === 0 ? handlePaste : undefined}
-                        inputProps={{
-                          maxLength: 1,
-                          style: {
-                            textAlign: 'center',
-                            fontWeight: 700,
-                            padding: 0,
-                          },
-                        }}
-                        sx={{
-                          width: { xs: '48px', sm: '56px', md: '64px' },
-                          fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' },
-                          '& .MuiOutlinedInput-root': {
-                            borderRadius: '7.5px',
-                            backgroundColor: theme.palette.custom.background.white,
-                            height: { xs: '56px', sm: '64px', md: '72px' },
-                            '& fieldset': {
-                              borderColor: error ? theme.palette.error.main : theme.palette.custom.border.default,
-                              borderWidth: '1px',
-                            },
-                            '&:hover fieldset': {
-                              borderColor: error ? theme.palette.error.main : theme.palette.custom.border.hover,
-                            },
-                            '&.Mui-focused fieldset': {
-                              borderColor: error ? theme.palette.error.main : theme.palette.custom.border.focus,
-                              borderWidth: '1.5px',
-                            },
-                          },
-                          '& .MuiInputBase-input': {
-                            color: theme.palette.custom.heading.primary,
-                            fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' },
-                            fontWeight: 700,
-                          },
-                        }}
-                      />
-                    ))}
-                  </Box>
-                </Grid>
-
-                {/* Error Message */}
-                {error && (
-                  <Grid size={{ xs: 12 }}>
-                    <Typography
-                      sx={{
-                        color: theme.palette.error.main,
-                        textAlign: 'center',
-                        mb: { xs: 2, sm: 2.5, md: 3 },
-                        fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
-                        fontWeight: 400,
-                        lineHeight: 1.5,
-                      }}
-                    >
-                      Incorrect OTP Code
-                    </Typography>
-                  </Grid>
+              {/* Contact Information Input */}
+              <Grid size={{ xs: 12 }}>
+                {selectedMethod === 'email' ? (
+                  <FormTextField
+                    name="email"
+                    control={methodForm.control}
+                    label="Email Address"
+                    type="email"
+                    sx={{ mb: { xs: 4, sm: 5, md: 6 } }}
+                  />
+                ) : (
+                  <FormTextField
+                    name="phoneNumber"
+                    control={methodForm.control}
+                    label="Phone Number"
+                    type="tel"
+                    sx={{ mb: { xs: 4, sm: 5, md: 6 } }}
+                  />
                 )}
-
-                {/* Resend OTP Link */}
-                <Grid size={{ xs: 12 }}>
-                  <Box 
-                    sx={{ 
-                      textAlign: 'center', 
+                {methodForm.formState.errors.root && (
+                  <Typography
+                    sx={{
+                      color: theme.palette.error.main,
+                      textAlign: 'center',
                       mb: { xs: 2, sm: 2.5, md: 3 },
+                      fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
+                      fontWeight: 400,
+                      lineHeight: 1.5,
                     }}
                   >
+                    {methodForm.formState.errors.root.message}
+                  </Typography>
+                )}
+              </Grid>
+
+              {/* Submit Button */}
+              <Grid size={{ xs: 12 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <FormButton disabled={methodForm.formState.isSubmitting}>
+                    Send OTP
+                  </FormButton>
+                </Box>
+              </Grid>
+            </Grid>
+          </Box>
+        )}
+
+        {/* OTP Verification Form */}
+        {step === 'otp' && (
+          <Box component="form" onSubmit={otpForm.handleSubmit(onOtpSubmit)} sx={{ width: '100%' }}>
+            <Grid container spacing={2.5}>
+              {/* OTP Input */}
+              <Grid size={{ xs: 12 }}>
+                <OtpInput name="otp" control={otpForm.control} />
+                {otpForm.formState.errors.otp && (
+                  <Typography
+                    sx={{
+                      color: theme.palette.error.main,
+                      textAlign: 'center',
+                      mb: { xs: 2, sm: 2.5, md: 3 },
+                      fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
+                      fontWeight: 400,
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {otpForm.formState.errors.otp.message}
+                  </Typography>
+                )}
+              </Grid>
+
+              {/* Resend OTP Link */}
+              <Grid size={{ xs: 12 }}>
+                <Box
+                  sx={{
+                    textAlign: 'center',
+                    mb: { xs: 2, sm: 2.5, md: 3 },
+                  }}
+                >
+                  <Typography
+                    variant="body2"
+                    component="span"
+                    sx={{
+                      color: theme.palette.custom.label.default,
+                      fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
+                      fontWeight: 400,
+                      lineHeight: 1.5,
+                      display: 'block',
+                      mb: canResend ? 0 : 1,
+                    }}
+                  >
+                    Did not receive OTP?{' '}
+                    {canResend && (
+                      <Link
+                        component="button"
+                        type="button"
+                        onClick={handleResend}
+                        sx={{
+                          fontSize: 'inherit',
+                          border: 'none',
+                          background: 'none',
+                          padding: 0,
+                        }}
+                      >
+                        Resend
+                      </Link>
+                    )}
+                  </Typography>
+                  {!canResend && (
                     <Typography
                       variant="body2"
                       component="span"
@@ -508,87 +420,36 @@ export default function OTPPage() {
                         fontWeight: 400,
                         lineHeight: 1.5,
                         display: 'block',
-                        mb: canResend ? 0 : 1,
                       }}
                     >
-                      Did not receive OTP?{' '}
-                      {canResend && (
-                        <Link
-                          component="button"
-                          type="button"
-                          onClick={handleResend}
-                          sx={{
-                            color: theme.palette.secondary.main,
-                            textDecoration: 'none',
-                            fontWeight: 400,
-                            fontSize: 'inherit',
-                            cursor: 'pointer',
-                            border: 'none',
-                            background: 'none',
-                            padding: 0,
-                            '&:hover': {
-                              textDecoration: 'underline',
-                              color: theme.palette.secondary.light,
-                            },
-                          }}
-                        >
-                          Resend
-                        </Link>
-                      )}
+                      Resend again in{' '}
+                      <Box component="span" sx={{ color: theme.palette.custom.heading.medium, fontWeight: 700 }}>
+                        {String(Math.floor(timer / 60)).padStart(2, '0')}:
+                        {String(timer % 60).padStart(2, '0')}
+                      </Box>
                     </Typography>
-                    {!canResend && (
-                      <Typography
-                        variant="body2"
-                        component="span"
-                        sx={{
-                          color: theme.palette.custom.label.default,
-                          fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
-                          fontWeight: 400,
-                          lineHeight: 1.5,
-                          display: 'block',
-                        }}
-                      >
-                        Resend again in{' '}
-                        <Box component="span" sx={{ color: '#333333', fontWeight: 700 }}>
-                          {String(Math.floor(timer / 60)).padStart(2, '0')}:{String(timer % 60).padStart(2, '0')}
-                        </Box>
-                      </Typography>
-                    )}
-                  </Box>
-                </Grid>
-              </>
-            )}
+                  )}
+                </Box>
+              </Grid>
 
-            {/* Primary Button */}
-            <Grid size={{ xs: 12 }}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <Button
-                  type="submit"
-                  variant="contained"
+              {/* Submit Button */}
+              <Grid size={{ xs: 12 }}>
+                <Box
                   sx={{
-                    height: { xs: '44px', sm: '41px', md: '41px' },
-                    borderRadius: '10px',
-                    textTransform: 'none',
-                    fontSize: { xs: '0.9375rem', sm: '1rem', md: '1.0625rem' },
-                    fontWeight: 700,
-                    backgroundColor: theme.palette.primary.main,
-                    boxShadow: 'none',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                   }}
                 >
-                  {step === 'method' ? 'Send OTP' : 'Confirm'}
-                </Button>
-              </Box>
+                  <FormButton disabled={otpForm.formState.isSubmitting}>
+                    Confirm
+                  </FormButton>
+                </Box>
+              </Grid>
             </Grid>
-          </Grid>
-        </Box>
+          </Box>
+        )}
       </Box>
     </AuthPageLayout>
   );
 }
-
