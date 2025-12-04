@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 
 export interface ScheduleCardProps {
   time: string;
@@ -24,12 +24,13 @@ export default function ScheduleCard({
   clientName,
   status = 'upcoming',
 }: ScheduleCardProps) {
+  const theme = useTheme();
   return (
     <Box
       sx={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: theme.palette.custom.background.white,
         borderRadius: '9.75px',
-        border: '0.5px solid #C3C1C1',
+        border: `0.5px solid ${theme.palette.custom.border.card}`,
         p: 2,
         minHeight: '73.9158px',
         width: '100%',
@@ -46,7 +47,7 @@ export default function ScheduleCard({
       >
         <Typography
           sx={{
-            color: '#6A7282',
+            color: theme.palette.custom.text.time,
             fontSize: '0.875rem',
             fontWeight: 400,
             lineHeight: 1.5,
@@ -69,7 +70,7 @@ export default function ScheduleCard({
         {/* Service Name */}
         <Typography
           sx={{
-            color: '#101828',
+            color: theme.palette.custom.text.service,
             fontSize: '0.9375rem',
             fontWeight: 600,
             lineHeight: 1.5,
@@ -81,7 +82,7 @@ export default function ScheduleCard({
         {/* Client Name */}
         <Typography
           sx={{
-            color: '#6A7282',
+            color: theme.palette.custom.text.client,
             fontSize: '0.875rem',
             fontWeight: 400,
             lineHeight: 1.5,

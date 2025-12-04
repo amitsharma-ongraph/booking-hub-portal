@@ -2,50 +2,131 @@
 
 import { createTheme } from '@mui/material/styles';
 
-// Custom theme matching the Figma design
+/**
+ * Comprehensive theme configuration for Booking Hub Portal
+ * All colors extracted from login, register, OTP, and dashboard pages
+ * 
+ * Color Palette:
+ * - Primary: #D2A298 (Peach/Coral - main brand color for buttons, focus states)
+ * - Secondary: #A3B899 (Green - links, accents, card values)
+ * - Text: Various shades for headings, body, labels, placeholders
+ * - Background: White and gradient backgrounds
+ * - Borders: Light grays for inputs and cards
+ * - Error: Red for validation errors
+ * - Special: Dashboard icon color, sidebar active state, etc.
+ */
 const theme = createTheme({
   palette: {
     mode: 'light',
+    // Primary brand color - used for buttons, focus states, active elements
     primary: {
-      main: '#6366F1', // Indigo/Purple accent from Figma
-      light: '#818CF8',
-      dark: '#4F46E5',
-      contrastText: '#ffffff',
+      main: '#D2A298', // Main peach/coral color
+      light: '#C8968A', // Hover state
+      dark: '#BE8A7C', // Active/pressed state
+      contrastText: '#FFFFFF',
     },
+    // Secondary accent color - used for links, card values, accents
     secondary: {
-      main: '#EC4899', // Pink accent
-      light: '#F472B6',
-      dark: '#DB2777',
-      contrastText: '#ffffff',
+      main: '#A3B899', // Main green color
+      light: '#8FA68A', // Hover state
+      dark: '#7A9470', // Darker variant
+      contrastText: '#FFFFFF',
     },
-    background: {
-      default: '#F9FAFB',
-      paper: '#FFFFFF',
+    // Error color - used for validation errors, error states
+    error: {
+      main: '#FF0000', // Red for errors
+      light: '#FF3333',
+      dark: '#CC0000',
+      contrastText: '#FFFFFF',
     },
-    text: {
-      primary: '#111827',
-      secondary: '#6B7280',
-    },
+    // Success color (can be used for success states)
     success: {
-      main: '#10B981',
-      light: '#34D399',
-      dark: '#059669',
+      main: '#A3B899', // Same as secondary green
+      light: '#8FA68A',
+      dark: '#7A9470',
+      contrastText: '#FFFFFF',
     },
+    // Warning color
     warning: {
       main: '#F59E0B',
       light: '#FBBF24',
       dark: '#D97706',
+      contrastText: '#FFFFFF',
     },
-    error: {
-      main: '#EF4444',
-      light: '#F87171',
-      dark: '#DC2626',
-    },
+    // Info color
     info: {
       main: '#3B82F6',
       light: '#60A5FA',
       dark: '#2563EB',
+      contrastText: '#FFFFFF',
     },
+    // Background colors
+    background: {
+      default: '#F9FAFB', // Light gray background
+      paper: '#FFFFFF', // White for cards, inputs
+    },
+    // Text colors
+    text: {
+      primary: '#041C2C', // Dark blue/black for main headings (login, register)
+      secondary: '#6A7282', // Gray for secondary text, placeholders
+      disabled: '#B0B0B0', // Light gray for disabled text, labels
+    },
+    // Custom colors for specific use cases
+    // These will be accessible via theme.palette.custom
+    // @ts-ignore - MUI allows custom palette properties
+    custom: {
+    // Text colors
+    heading: {
+      primary: '#041C2C', // Login/Register headings
+      dashboard: '#0A0A0A', // Dashboard page heading
+      dark: '#101828', // Dark gray for service names, important text
+      medium: '#333333', // Medium gray for OTP heading, terms text
+    },
+    // Label and placeholder colors
+    label: {
+      default: '#B0B0B0', // Input labels, placeholders
+      secondary: '#747474', // OTP description text
+    },
+    // Border colors
+    border: {
+      default: '#EDEDED', // Default input border
+      hover: '#D1D5DB', // Input border on hover
+      focus: '#D2A298', // Input border on focus (primary color)
+      card: '#C3C1C1', // Schedule card border
+      divider: '#E5E7EB', // Sidebar, TopBar borders
+      radio: '#E0E0E0', // Radio button border (unselected)
+    },
+    // Background colors
+    background: {
+      white: '#FFFFFF',
+      gradient: {
+        start: '#FFFFFF',
+        middle: '#D6DFD1',
+        end: '#A3B899',
+      },
+      sidebar: {
+        active: '#D9B5A1', // Sidebar active item background
+      },
+    },
+    // Special colors
+    icon: {
+      dashboard: '#CFA09F', // Dashboard card icon color
+    },
+    // Status colors
+    status: {
+      logout: '#E1000F', // Logout button color
+      notification: '#E57373', // Notification dot color
+      disabled: '#CCCCCC', // Disabled elements
+    },
+    // Text hierarchy
+    text: {
+      time: '#6A7282', // Time text in schedule cards
+      client: '#6A7282', // Client name text
+      service: '#101828', // Service name text
+      account: '#808080', // Account number text
+      subtitle: '#6A7282', // Dashboard subtitle
+    },
+  },
   },
   typography: {
     fontFamily: [
@@ -75,8 +156,8 @@ const theme = createTheme({
     },
     h4: {
       fontSize: '1.5rem',
-      fontWeight: 600,
-      lineHeight: 1.4,
+      fontWeight: 700, // Changed to 700 to match login/register
+      lineHeight: 1.2,
     },
     h5: {
       fontSize: '1.25rem',
@@ -91,73 +172,44 @@ const theme = createTheme({
     body1: {
       fontSize: '1rem',
       lineHeight: 1.5,
+      fontWeight: 400,
     },
     body2: {
       fontSize: '0.875rem',
       lineHeight: 1.5,
+      fontWeight: 400,
     },
     button: {
       textTransform: 'none',
-      fontWeight: 500,
+      fontWeight: 700, // Changed to 700 to match buttons
+      fontSize: '1rem',
     },
   },
   shape: {
-    borderRadius: 12,
+    borderRadius: 8, // Default border radius
   },
-  shadows: [
-    'none',
-    '0px 2px 4px rgba(0, 0, 0, 0.05)',
-    '0px 4px 6px rgba(0, 0, 0, 0.07)',
-    '0px 6px 12px rgba(0, 0, 0, 0.08)',
-    '0px 8px 16px rgba(0, 0, 0, 0.1)',
-    '0px 12px 24px rgba(0, 0, 0, 0.12)',
-    '0px 16px 32px rgba(0, 0, 0, 0.14)',
-    '0px 20px 40px rgba(0, 0, 0, 0.16)',
-    '0px 24px 48px rgba(0, 0, 0, 0.18)',
-    '0px 2px 4px rgba(0, 0, 0, 0.05)',
-    '0px 4px 6px rgba(0, 0, 0, 0.07)',
-    '0px 6px 12px rgba(0, 0, 0, 0.08)',
-    '0px 8px 16px rgba(0, 0, 0, 0.1)',
-    '0px 12px 24px rgba(0, 0, 0, 0.12)',
-    '0px 16px 32px rgba(0, 0, 0, 0.14)',
-    '0px 20px 40px rgba(0, 0, 0, 0.16)',
-    '0px 24px 48px rgba(0, 0, 0, 0.18)',
-    '0px 2px 4px rgba(0, 0, 0, 0.05)',
-    '0px 4px 6px rgba(0, 0, 0, 0.07)',
-    '0px 6px 12px rgba(0, 0, 0, 0.08)',
-    '0px 8px 16px rgba(0, 0, 0, 0.1)',
-    '0px 12px 24px rgba(0, 0, 0, 0.12)',
-    '0px 16px 32px rgba(0, 0, 0, 0.14)',
-    '0px 20px 40px rgba(0, 0, 0, 0.16)',
-    '0px 24px 48px rgba(0, 0, 0, 0.18)',
-  ],
+  // Component overrides
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
-          padding: '10px 24px',
-          fontSize: '0.875rem',
-          fontWeight: 500,
+          borderRadius: '10px', // Match button border radius from design
+          textTransform: 'none',
+          fontWeight: 700,
           boxShadow: 'none',
           '&:hover': {
-            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+            boxShadow: 'none',
           },
         },
         contained: {
+          backgroundColor: '#D2A298', // Primary color
+          color: '#FFFFFF',
           '&:hover': {
-            boxShadow: '0px 6px 12px rgba(0, 0, 0, 0.15)',
+            backgroundColor: '#C8968A', // Primary light
+            boxShadow: 'none',
           },
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-          boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
-          '&:hover': {
-            boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.12)',
+          '&:active': {
+            backgroundColor: '#BE8A7C', // Primary dark
           },
         },
       },
@@ -166,30 +218,193 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            borderRadius: 8,
+            borderRadius: '7.5px', // Match input border radius from design
+            backgroundColor: '#FFFFFF',
+            '& fieldset': {
+              borderColor: '#EDEDED', // Default border
+              borderWidth: '1px',
+            },
+            '&:hover fieldset': {
+              borderColor: '#D1D5DB', // Hover border
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: '#D2A298', // Focus border (primary)
+              borderWidth: '1.5px',
+            },
+            '&.Mui-error fieldset': {
+              borderColor: '#FF0000', // Error border
+            },
+            '&.Mui-error:hover fieldset': {
+              borderColor: '#FF0000',
+            },
+            '&.Mui-error.Mui-focused fieldset': {
+              borderColor: '#FF0000',
+              borderWidth: '1px',
+            },
+          },
+          '& .MuiInputBase-input': {
+            color: '#041C2C', // Text color
+            '&::placeholder': {
+              color: '#B0B0B0', // Placeholder color
+              opacity: 1,
+            },
+          },
+          '& .MuiInputLabel-root': {
+            color: '#B0B0B0', // Label color
           },
         },
       },
     },
-    MuiPaper: {
+    MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
-        },
-        elevation1: {
-          boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
+          borderRadius: '15.5796px', // Match card border radius
+          backgroundColor: '#FFFFFF',
+          boxShadow: '0px 0px 0px 1px rgba(0, 0, 0, 0.1)', // Card shadow
         },
       },
     },
-    MuiChip: {
+    MuiLink: {
       styleOverrides: {
         root: {
-          borderRadius: 6,
-          fontWeight: 500,
+          color: '#A3B899', // Secondary green
+          textDecoration: 'none',
+          fontWeight: 400,
+          '&:hover': {
+            textDecoration: 'underline',
+            color: '#8FA68A', // Secondary light
+          },
+        },
+      },
+    },
+    MuiCheckbox: {
+      styleOverrides: {
+        root: {
+          color: '#D2A298', // Primary color
+          '&.Mui-checked': {
+            color: '#D2A298',
+          },
+          '&.Mui-error': {
+            color: '#FF0000',
+            '&.Mui-checked': {
+              color: '#FF0000',
+            },
+          },
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#FFFFFF',
+          color: '#101828',
+          boxShadow: 'none',
+          borderBottom: '1px solid #E5E7EB',
         },
       },
     },
   },
 });
+
+// Extend the theme type to include custom palette
+declare module '@mui/material/styles' {
+  interface Palette {
+    custom: {
+      heading: {
+        primary: string;
+        dashboard: string;
+        dark: string;
+        medium: string;
+      };
+      label: {
+        default: string;
+        secondary: string;
+      };
+      border: {
+        default: string;
+        hover: string;
+        focus: string;
+        card: string;
+        divider: string;
+        radio: string;
+      };
+      background: {
+        white: string;
+        gradient: {
+          start: string;
+          middle: string;
+          end: string;
+        };
+        sidebar: {
+          active: string;
+        };
+      };
+      icon: {
+        dashboard: string;
+      };
+      status: {
+        logout: string;
+        notification: string;
+        disabled: string;
+      };
+      text: {
+        time: string;
+        client: string;
+        service: string;
+        account: string;
+        subtitle: string;
+      };
+    };
+  }
+
+  interface PaletteOptions {
+    custom?: {
+      heading?: {
+        primary?: string;
+        dashboard?: string;
+        dark?: string;
+        medium?: string;
+      };
+      label?: {
+        default?: string;
+        secondary?: string;
+      };
+      border?: {
+        default?: string;
+        hover?: string;
+        focus?: string;
+        card?: string;
+        divider?: string;
+        radio?: string;
+      };
+      background?: {
+        white?: string;
+        gradient?: {
+          start?: string;
+          middle?: string;
+          end?: string;
+        };
+        sidebar?: {
+          active?: string;
+        };
+      };
+      icon?: {
+        dashboard?: string;
+      };
+      status?: {
+        logout?: string;
+        notification?: string;
+        disabled?: string;
+      };
+      text?: {
+        time?: string;
+        client?: string;
+        service?: string;
+        account?: string;
+        subtitle?: string;
+      };
+    };
+  }
+}
 
 export default theme;

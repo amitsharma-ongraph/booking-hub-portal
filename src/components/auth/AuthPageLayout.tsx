@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Card } from '@mui/material';
+import { Box, Card, useTheme } from '@mui/material';
 import Image from 'next/image';
 
 interface AuthPageLayoutProps {
@@ -10,13 +10,14 @@ interface AuthPageLayoutProps {
 }
 
 export default function AuthPageLayout({ children, cardHeight }: AuthPageLayoutProps) {
+  const theme = useTheme();
   return (
     <Box
       sx={{
         minHeight: '100vh',
         position: 'relative',
-        // Background gradient from SVG: white -> #D6DFD1 -> #A3B899
-        background: 'linear-gradient(180deg, #FFFFFF 0%, #D6DFD1 44.71%, #A3B899 100%)',
+        // Background gradient
+        background: `linear-gradient(180deg, ${theme.palette.custom.background.gradient.start} 0%, ${theme.palette.custom.background.gradient.middle} 44.71%, ${theme.palette.custom.background.gradient.end} 100%)`,
         overflow: 'hidden',
         display: 'flex',
         alignItems: 'center',
@@ -114,7 +115,7 @@ export default function AuthPageLayout({ children, cardHeight }: AuthPageLayoutP
           },
           borderRadius: { xs: 3, sm: '30px' },
           boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.08)',
-          backgroundColor: '#FFFFFF',
+          backgroundColor: theme.palette.custom.background.white,
           p: { xs: 3, sm: 4, md: '36.5px' },
           // Center children content within the card
           display: 'flex',

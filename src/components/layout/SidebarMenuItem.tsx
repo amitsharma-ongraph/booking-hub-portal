@@ -6,6 +6,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  useTheme,
 } from '@mui/material';
 import SvgIconWrapper from '@/components/icons/SvgIconWrapper';
 
@@ -48,7 +49,8 @@ export default function SidebarMenuItem({
   };
 
   // Icon color: black when not selected, white when selected (for non-logout items)
-  const iconColor = isLogout ? '#E1000F' : isActive ? '#FFFFFF' : '#000000';
+  const theme = useTheme();
+  const iconColor = isLogout ? theme.palette.custom.status.logout : isActive ? theme.palette.common.white : theme.palette.common.black;
 
   return (
     <ListItem disablePadding sx={{ mb: 0.5 }}>
@@ -58,14 +60,14 @@ export default function SidebarMenuItem({
           borderRadius: '10px',
           py: 1.75,
           px: 2,
-          backgroundColor: isActive && !isLogout ? '#D9B5A1' : 'transparent',
-          color: isLogout ? '#E1000F' : isActive ? '#FFFFFF' : '#364153',
+          backgroundColor: isActive && !isLogout ? theme.palette.custom.background.sidebar.active : 'transparent',
+          color: isLogout ? theme.palette.custom.status.logout : isActive ? theme.palette.common.white : theme.palette.text.primary,
           minHeight: '53.42px',
           '&:hover': {
             backgroundColor: isLogout
               ? 'rgba(225, 0, 15, 0.1)'
               : isActive
-              ? '#D9B5A1'
+              ? theme.palette.custom.background.sidebar.active
               : 'rgba(217, 181, 161, 0.1)',
           },
           '& .MuiListItemIcon-root': {
@@ -100,7 +102,7 @@ export default function SidebarMenuItem({
           primaryTypographyProps={{
             fontWeight: isActive && !isLogout ? 500 : 400,
             fontSize: '0.9375rem',
-            color: isLogout ? '#E1000F' : isActive ? '#FFFFFF' : '#364153',
+            color: isLogout ? theme.palette.custom.status.logout : isActive ? theme.palette.common.white : theme.palette.text.primary,
           }}
         />
       </ListItemButton>

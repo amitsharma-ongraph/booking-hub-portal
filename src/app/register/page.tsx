@@ -11,12 +11,14 @@ import {
   Checkbox,
   FormControlLabel,
   InputAdornment,
+  useTheme,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import AuthPageLayout from '@/components/auth/AuthPageLayout';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const theme = useTheme();
 
   const [firstName, setFirstName] = useState('Arwa Khalifa');
   const [lastName, setLastName] = useState('');
@@ -135,7 +137,7 @@ export default function RegisterPage() {
           variant="h4"
           sx={{
             fontWeight: 700,
-            color: '#041C2C',
+            color: theme.palette.custom.heading.primary,
             textAlign: 'center',
             mb: { xs: 3, sm: 4, md: 4.5 },
             fontSize: { xs: '1.5rem', sm: '2rem', md: '2rem' },
@@ -154,7 +156,7 @@ export default function RegisterPage() {
               <Typography
                 variant="body1"
                 sx={{
-                  color: '#B0B0B0',
+                  color: theme.palette.custom.label.default,
                   fontWeight: 400,
                   mb: 1.5,
                   fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
@@ -173,36 +175,36 @@ export default function RegisterPage() {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '7.5px',
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: theme.palette.custom.background.white,
                     height: { xs: '44px', sm: '44px', md: '44px' },
                     fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
                     '& fieldset': {
-                      borderColor: errors.firstName ? '#FF0000' : '#EDEDED',
+                      borderColor: errors.firstName ? theme.palette.error.main : theme.palette.custom.border.default,
                       borderWidth: '1px',
                     },
                     '&:hover fieldset': {
-                      borderColor: errors.firstName ? '#FF0000' : '#D1D5DB',
+                      borderColor: errors.firstName ? theme.palette.error.main : theme.palette.custom.border.hover,
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: errors.firstName ? '#FF0000' : '#D2A298',
+                      borderColor: errors.firstName ? theme.palette.error.main : theme.palette.custom.border.focus,
                       borderWidth: errors.firstName ? '1px' : '1.5px',
                     },
                     '&.Mui-error fieldset': {
-                      borderColor: '#FF0000',
+                      borderColor: theme.palette.error.main,
                     },
                     '&.Mui-error:hover fieldset': {
-                      borderColor: '#FF0000',
+                      borderColor: theme.palette.error.main,
                     },
                     '&.Mui-error.Mui-focused fieldset': {
-                      borderColor: '#FF0000',
+                      borderColor: theme.palette.error.main,
                     },
                   },
                   '& .MuiInputBase-input': {
-                    color: '#041C2C',
+                    color: theme.palette.custom.heading.primary,
                     py: { xs: 1.25, sm: 1.5 },
                     px: 1,
                     '&::placeholder': {
-                      color: '#B0B0B0',
+                      color: theme.palette.custom.label.default,
                       opacity: 1,
                       fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
                     },
@@ -212,7 +214,7 @@ export default function RegisterPage() {
               {errors.firstName && (
                 <Typography
                   sx={{
-                    color: '#FF0000',
+                    color: theme.palette.error.main,
                     mt: 1,
                     fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
                     fontWeight: 400,
@@ -229,7 +231,7 @@ export default function RegisterPage() {
               <Typography
                 variant="body1"
                 sx={{
-                  color: '#B0B0B0',
+                  color: theme.palette.custom.label.default,
                   fontWeight: 400,
                   mb: 1.5,
                   fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
@@ -248,7 +250,7 @@ export default function RegisterPage() {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '7.5px',
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: theme.palette.custom.background.white,
                     height: { xs: '44px', sm: '44px', md: '44px' },
                     fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
                     '& fieldset': {
@@ -263,21 +265,21 @@ export default function RegisterPage() {
                       borderWidth: errors.lastName ? '1px' : '1.5px',
                     },
                     '&.Mui-error fieldset': {
-                      borderColor: '#FF0000',
+                      borderColor: theme.palette.error.main,
                     },
                     '&.Mui-error:hover fieldset': {
-                      borderColor: '#FF0000',
+                      borderColor: theme.palette.error.main,
                     },
                     '&.Mui-error.Mui-focused fieldset': {
-                      borderColor: '#FF0000',
+                      borderColor: theme.palette.error.main,
                     },
                   },
                   '& .MuiInputBase-input': {
-                    color: '#041C2C',
+                    color: theme.palette.custom.heading.primary,
                     py: { xs: 1.25, sm: 1.5 },
                     px: 1,
                     '&::placeholder': {
-                      color: '#B0B0B0',
+                      color: theme.palette.custom.label.default,
                       opacity: 1,
                       fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
                     },
@@ -288,7 +290,7 @@ export default function RegisterPage() {
                 {errors.lastName && (
                   <Typography
                     sx={{
-                      color: '#FF0000',
+                      color: theme.palette.error.main,
                       fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
                       fontWeight: 400,
                       lineHeight: 1.5,
@@ -299,7 +301,7 @@ export default function RegisterPage() {
                 )}
                 <Typography
                   sx={{
-                    color: '#B0B0B0',
+                    color: theme.palette.custom.label.default,
                     fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
                     fontWeight: 400,
                     lineHeight: 1.5,
@@ -316,7 +318,7 @@ export default function RegisterPage() {
               <Typography
                 variant="body1"
                 sx={{
-                  color: '#B0B0B0',
+                  color: theme.palette.custom.label.default,
                   fontWeight: 400,
                   mb: 1.5,
                   fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
@@ -336,7 +338,7 @@ export default function RegisterPage() {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '7.5px',
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: theme.palette.custom.background.white,
                     height: { xs: '44px', sm: '44px', md: '44px' },
                     fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
                     '& fieldset': {
@@ -351,21 +353,21 @@ export default function RegisterPage() {
                       borderWidth: errors.email ? '1px' : '1.5px',
                     },
                     '&.Mui-error fieldset': {
-                      borderColor: '#FF0000',
+                      borderColor: theme.palette.error.main,
                     },
                     '&.Mui-error:hover fieldset': {
-                      borderColor: '#FF0000',
+                      borderColor: theme.palette.error.main,
                     },
                     '&.Mui-error.Mui-focused fieldset': {
-                      borderColor: '#FF0000',
+                      borderColor: theme.palette.error.main,
                     },
                   },
                   '& .MuiInputBase-input': {
-                    color: '#041C2C',
+                    color: theme.palette.custom.heading.primary,
                     py: { xs: 1.25, sm: 1.5 },
                     px: 1,
                     '&::placeholder': {
-                      color: '#B0B0B0',
+                      color: theme.palette.custom.label.default,
                       opacity: 1,
                       fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
                     },
@@ -375,7 +377,7 @@ export default function RegisterPage() {
               {errors.email && (
                 <Typography
                   sx={{
-                    color: '#FF0000',
+                    color: theme.palette.error.main,
                     mt: 1,
                     fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
                     fontWeight: 400,
@@ -392,7 +394,7 @@ export default function RegisterPage() {
               <Typography
                 variant="body1"
                 sx={{
-                  color: '#B0B0B0',
+                  color: theme.palette.custom.label.default,
                   fontWeight: 400,
                   mb: 1.5,
                   fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
@@ -410,7 +412,7 @@ export default function RegisterPage() {
                     width: { xs: '100px', sm: '120px' },
                     '& .MuiOutlinedInput-root': {
                       borderRadius: '7.5px',
-                      backgroundColor: '#FFFFFF',
+                      backgroundColor: theme.palette.custom.background.white,
                       height: { xs: '44px', sm: '44px', md: '44px' },
                       fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
                       '& fieldset': {
@@ -435,7 +437,7 @@ export default function RegisterPage() {
                       },
                     },
                     '& .MuiInputBase-input': {
-                      color: '#041C2C',
+                      color: theme.palette.custom.heading.primary,
                       py: { xs: 1.25, sm: 1.5 },
                       px: 1,
                       textAlign: 'center',
@@ -453,7 +455,7 @@ export default function RegisterPage() {
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: '7.5px',
-                      backgroundColor: '#FFFFFF',
+                      backgroundColor: theme.palette.custom.background.white,
                       height: { xs: '44px', sm: '44px', md: '44px' },
                       fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
                       '& fieldset': {
@@ -478,11 +480,11 @@ export default function RegisterPage() {
                       },
                     },
                     '& .MuiInputBase-input': {
-                      color: '#041C2C',
+                      color: theme.palette.custom.heading.primary,
                       py: { xs: 1.25, sm: 1.5 },
                       px: 1,
                       '&::placeholder': {
-                        color: '#B0B0B0',
+                        color: theme.palette.custom.label.default,
                         opacity: 1,
                         fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
                       },
@@ -493,7 +495,7 @@ export default function RegisterPage() {
               {errors.phoneNumber && (
                 <Typography
                   sx={{
-                    color: '#FF0000',
+                    color: theme.palette.error.main,
                     mt: 1,
                     fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
                     fontWeight: 400,
@@ -513,9 +515,9 @@ export default function RegisterPage() {
                     checked={termsAccepted}
                     onChange={handleTermsChange}
                     sx={{
-                      color: errors.terms ? '#FF0000' : '#D2A298',
+                      color: errors.terms ? theme.palette.error.main : theme.palette.primary.main,
                       '&.Mui-checked': {
-                        color: errors.terms ? '#FF0000' : '#D2A298',
+                        color: errors.terms ? theme.palette.error.main : theme.palette.primary.main,
                       },
                       '& .MuiSvgIcon-root': {
                         fontSize: { xs: '1.25rem', sm: '1.5rem' },
@@ -526,7 +528,7 @@ export default function RegisterPage() {
                 label={
                   <Typography
                     sx={{
-                      color: '#333333',
+                      color: theme.palette.custom.heading.medium,
                       fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
                       fontWeight: 400,
                       lineHeight: 1.5,
@@ -536,11 +538,11 @@ export default function RegisterPage() {
                     <Link
                       href="#"
                       sx={{
-                        color: '#333333',
+                        color: theme.palette.custom.heading.medium,
                         textDecoration: 'underline',
                         fontWeight: 400,
                         '&:hover': {
-                          color: '#041C2C',
+                          color: theme.palette.custom.heading.primary,
                         },
                       }}
                     >
@@ -560,7 +562,7 @@ export default function RegisterPage() {
               {errors.terms && (
                 <Typography
                   sx={{
-                    color: '#FF0000',
+                    color: theme.palette.error.main,
                     mt: 1,
                     ml: 4.5,
                     fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
@@ -585,17 +587,7 @@ export default function RegisterPage() {
                   textTransform: 'none',
                   fontSize: { xs: '0.9375rem', sm: '1rem', md: '1.0625rem' },
                   fontWeight: 700,
-                  backgroundColor: '#D2A298',
-                  color: '#FFFFFF',
-                  boxShadow: 'none',
                   mt: { xs: 1, sm: 1.5 },
-                  '&:hover': {
-                    backgroundColor: '#C8968A',
-                    boxShadow: 'none',
-                  },
-                  '&:active': {
-                    backgroundColor: '#BE8A7C',
-                  },
                 }}
               >
                 Sign Up
@@ -614,7 +606,7 @@ export default function RegisterPage() {
                   variant="body2"
                   component="span"
                   sx={{
-                    color: '#B0B0B0',
+                    color: theme.palette.custom.label.default,
                     fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
                     fontWeight: 400,
                     lineHeight: 1.5,
@@ -624,13 +616,13 @@ export default function RegisterPage() {
                   <Link
                     href="/login"
                     sx={{
-                      color: '#A3B899',
+                      color: theme.palette.secondary.main,
                       textDecoration: 'none',
                       fontWeight: 400,
                       fontSize: 'inherit',
                       '&:hover': {
                         textDecoration: 'underline',
-                        color: '#8FA68A',
+                        color: theme.palette.secondary.light,
                       },
                     }}
                   >

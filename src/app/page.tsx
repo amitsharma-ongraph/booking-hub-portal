@@ -1,12 +1,13 @@
 'use client';
 
 import React from 'react';
-import { Grid, Typography, Box } from '@mui/material';
+import { Grid, Typography, Box, useTheme } from '@mui/material';
 import MainLayout from '@/components/layout/MainLayout';
 import DashboardStatCard from '@/components/cards/DashboardStatCard';
 import TodaySchedule from '@/components/dashboard/TodaySchedule';
 
 export default function DashboardPage() {
+  const theme = useTheme();
   return (
     <MainLayout>
       <Box sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
@@ -15,7 +16,7 @@ export default function DashboardPage() {
           <Typography
             variant="h4"
             sx={{
-              color: '#0A0A0A',
+              color: theme.palette.custom.heading.dashboard,
               fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
               fontWeight: 700,
               lineHeight: 1.2,
@@ -27,7 +28,7 @@ export default function DashboardPage() {
           <Typography
             variant="body1"
             sx={{
-              color: '#6A7282',
+              color: theme.palette.custom.text.subtitle,
               fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
               fontWeight: 400,
               lineHeight: 1.5,

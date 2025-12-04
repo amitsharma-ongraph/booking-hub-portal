@@ -5,7 +5,7 @@ import {
   Drawer,
   List,
   Box,
-  useTheme,
+  useTheme as useMuiTheme,
   useMediaQuery,
 } from '@mui/material';
 import Image from 'next/image';
@@ -54,7 +54,7 @@ const logoutItem: Omit<SidebarMenuItemProps, 'isActive' | 'onClick'> = {
 };
 
 export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
-  const theme = useTheme();
+  const theme = useMuiTheme();
   const pathname = usePathname();
   const router = useRouter();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -72,7 +72,7 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: theme.palette.custom.background.white,
       }}
     >
       {/* Logo/Brand - Height: 80px */}
@@ -111,7 +111,7 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
       <Box
         sx={{
           height: '1px',
-          backgroundColor: '#E5E7EB',
+          backgroundColor: theme.palette.custom.border.divider,
           width: '100%',
         }}
       />
@@ -141,7 +141,7 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
       {/* Footer Section with Logout */}
       <Box
         sx={{
-          borderTop: '1px solid #E5E7EB',
+          borderTop: `1px solid ${theme.palette.custom.border.divider}`,
           pt: 2,
           pb: 2,
         }}
@@ -178,8 +178,8 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
           '& .MuiDrawer-paper': {
             boxSizing: 'border-box',
             width: drawerWidth,
-            backgroundColor: '#FFFFFF',
-            borderRight: '1px solid #E5E7EB',
+            backgroundColor: theme.palette.custom.background.white,
+            borderRight: `1px solid ${theme.palette.custom.border.divider}`,
           },
         }}
       >
@@ -194,8 +194,8 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
           '& .MuiDrawer-paper': {
             boxSizing: 'border-box',
             width: drawerWidth,
-            borderRight: '1px solid #E5E7EB',
-            backgroundColor: '#FFFFFF',
+            borderRight: `1px solid ${theme.palette.custom.border.divider}`,
+            backgroundColor: theme.palette.custom.background.white,
           },
         }}
         open

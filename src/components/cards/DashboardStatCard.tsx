@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Card, CardContent, Box, Typography } from '@mui/material';
+import { Card, CardContent, Box, Typography, useTheme } from '@mui/material';
 import SvgIconWrapper from '@/components/icons/SvgIconWrapper';
 
 export interface DashboardStatCardProps {
@@ -30,13 +30,14 @@ export default function DashboardStatCard({
   icon,
   value,
 }: DashboardStatCardProps) {
+  const theme = useTheme();
   // Check if icon is a string path or SVG component
   const isStringPath = typeof icon === 'string';
 
   return (
     <Card
       sx={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: theme.palette.custom.background.white,
         borderRadius: '15.5796px',
         boxShadow: '0px 0px 0px 1px rgba(0, 0, 0, 0.1)',
         height: '131px',
@@ -64,7 +65,7 @@ export default function DashboardStatCard({
           {/* Title - Top Left */}
           <Typography
             sx={{
-              color: '#0A0A0A',
+              color: theme.palette.custom.heading.dashboard,
               fontSize: '0.875rem',
               fontWeight: 400,
               lineHeight: 1.5,
@@ -88,7 +89,7 @@ export default function DashboardStatCard({
               src={isStringPath ? (icon as string) : (icon as React.ComponentType<React.SVGProps<SVGSVGElement>>)}
               size={isStringPath ? 24 : undefined}
               sx={{
-                color: '#CFA09F',
+                color: theme.palette.custom.icon.dashboard,
                 fontSize: isStringPath ? undefined : '1.5rem',
               }}
             />
@@ -104,7 +105,7 @@ export default function DashboardStatCard({
         >
           <Typography
             sx={{
-              color: '#A3B899',
+              color: theme.palette.secondary.main,
               fontSize: '1.5rem',
               fontWeight: 600,
               lineHeight: 1.2,

@@ -46,9 +46,9 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
       position="sticky"
       elevation={0}
       sx={{
-        backgroundColor: '#FFFFFF',
-        borderBottom: '1px solid #E5E7EB',
-        color: '#101828',
+        backgroundColor: theme.palette.custom.background.white,
+        borderBottom: `1px solid ${theme.palette.custom.border.divider}`,
+        color: theme.palette.custom.heading.dark,
         height: '80px',
       }}
     >
@@ -68,7 +68,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
           onClick={onMenuClick}
           sx={{
             display: { md: 'none' },
-            color: '#101828',
+            color: theme.palette.custom.heading.dark,
           }}
         >
           <MenuIcon />
@@ -90,7 +90,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
           <IconButton
             color="inherit"
             sx={{
-              color: '#4A5565',
+              color: theme.palette.text.secondary,
               p: 1,
             }}
           >
@@ -98,7 +98,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
               variant="dot"
               sx={{
                 '& .MuiBadge-badge': {
-                  backgroundColor: '#E57373',
+                  backgroundColor: theme.palette.custom.status.notification,
                   right: 4,
                   top: 4,
                 },
@@ -120,7 +120,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
             <Typography
               variant="body1"
               sx={{
-                color: '#101828',
+                color: theme.palette.custom.heading.dark,
                 fontSize: '0.875rem',
                 fontWeight: 400,
                 lineHeight: 1.5,
@@ -131,7 +131,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
             <Typography
               variant="caption"
               sx={{
-                color: '#808080',
+                color: theme.palette.custom.text.account,
                 fontSize: '0.75rem',
                 fontWeight: 400,
                 lineHeight: 1.5,

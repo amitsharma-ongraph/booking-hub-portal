@@ -10,6 +10,7 @@ import {
   Link,
   Alert,
   InputAdornment,
+  useTheme,
 } from '@mui/material';
 import {
   Phone as PhoneIcon,
@@ -19,6 +20,7 @@ import AuthPageLayout from '@/components/auth/AuthPageLayout';
 
 export default function LoginPage() {
   const router = useRouter();
+  const theme = useTheme();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [error, setError] = useState('');
 
@@ -46,15 +48,15 @@ export default function LoginPage() {
           minHeight: '100%',
         }}
       >
-        {/* Login Heading - Color from SVG: #041C2C */}
+        {/* Login Heading */}
         <Typography
           variant="h4"
           sx={{
             fontWeight: 700,
-            color: '#041C2C', // Exact color from SVG
+            color: theme.palette.custom.heading.primary,
             textAlign: 'center',
             mb: { xs: 3, sm: 4, md: 4.5 },
-            fontSize: { xs: '1.5rem', sm: '2rem', md: '2rem' }, // Approximately 32px
+            fontSize: { xs: '1.5rem', sm: '2rem', md: '2rem' },
             lineHeight: 1.2,
             fontFamily: 'inherit',
             width: '100%',
@@ -78,12 +80,12 @@ export default function LoginPage() {
 
         <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Grid container spacing={2.5}>
-            {/* Phone Number Label - Color from SVG: #B0B0B0 */}
+            {/* Phone Number Label */}
             <Grid size={{ xs: 12 }}>
               <Typography
                 variant="body1"
                 sx={{
-                  color: '#B0B0B0', // Exact color from SVG
+                  color: theme.palette.custom.label.default,
                   fontWeight: 400,
                   mb: 1.5,
                   fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
@@ -94,7 +96,7 @@ export default function LoginPage() {
               </Typography>
             </Grid>
 
-            {/* Phone Number Input - Dimensions from SVG: width="512" height="44" rx="7.5" border="#EDEDED" */}
+            {/* Phone Number Input */}
             <Grid size={{ xs: 12 }}>
               <TextField
                 fullWidth
@@ -105,28 +107,28 @@ export default function LoginPage() {
                 required
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    borderRadius: '7.5px', // Exact from SVG rx="7.5"
-                    backgroundColor: '#FFFFFF',
-                    height: { xs: '44px', sm: '44px', md: '44px' }, // Exact height from SVG
+                    borderRadius: '7.5px',
+                    backgroundColor: theme.palette.custom.background.white,
+                    height: { xs: '44px', sm: '44px', md: '44px' },
                     fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
                     '& fieldset': {
-                      borderColor: '#EDEDED', // Exact border color from SVG
+                      borderColor: theme.palette.custom.border.default,
                       borderWidth: '1px',
                     },
                     '&:hover fieldset': {
-                      borderColor: '#D1D5DB',
+                      borderColor: theme.palette.custom.border.hover,
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: '#D2A298', // Button color for focus
+                      borderColor: theme.palette.custom.border.focus,
                       borderWidth: '1.5px',
                     },
                   },
                   '& .MuiInputBase-input': {
-                    color: '#041C2C',
+                    color: theme.palette.custom.heading.primary,
                     py: { xs: 1.25, sm: 1.5 },
                     px: 1,
                     '&::placeholder': {
-                      color: '#B0B0B0', // Same as label color
+                      color: theme.palette.custom.label.default,
                       opacity: 1,
                       fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
                     },
@@ -137,7 +139,7 @@ export default function LoginPage() {
                     <InputAdornment position="start" sx={{ ml: 1 }}>
                       <PhoneIcon 
                         sx={{ 
-                          color: '#B0B0B0', 
+                          color: theme.palette.custom.label.default, 
                           fontSize: { xs: '1.125rem', sm: '1.25rem', md: '1.375rem' } 
                         }} 
                       />
@@ -147,36 +149,26 @@ export default function LoginPage() {
               />
             </Grid>
 
-            {/* Sign In Button - Dimensions from SVG: width="513" height="41" rx="10" fill="#D2A298" */}
+            {/* Sign In Button */}
             <Grid size={{ xs: 12 }}>
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 sx={{
-                  height: { xs: '44px', sm: '41px', md: '41px' }, // Exact height from SVG
-                  borderRadius: '10px', // Exact from SVG rx="10"
+                  height: { xs: '44px', sm: '41px', md: '41px' },
+                  borderRadius: '10px',
                   textTransform: 'none',
                   fontSize: { xs: '0.9375rem', sm: '1rem', md: '1.0625rem' },
                   fontWeight: 700,
-                  backgroundColor: '#D2A298', // Exact color from SVG
-                  color: '#FFFFFF',
-                  boxShadow: 'none',
                   mt: { xs: 0.5, sm: 1 },
-                  '&:hover': {
-                    backgroundColor: '#C8968A',
-                    boxShadow: 'none',
-                  },
-                  '&:active': {
-                    backgroundColor: '#BE8A7C',
-                  },
                 }}
               >
                 Sign In
               </Button>
             </Grid>
 
-            {/* Sign Up Link - Colors from SVG: text="#B0B0B0" link="#A3B899" */}
+            {/* Sign Up Link */}
             <Grid size={{ xs: 12 }}>
               <Box 
                 sx={{ 
@@ -188,7 +180,7 @@ export default function LoginPage() {
                   variant="body2"
                   component="span"
                   sx={{
-                    color: '#B0B0B0', // Exact color from SVG
+                    color: theme.palette.custom.label.default,
                     fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
                     fontWeight: 400,
                     lineHeight: 1.5,
@@ -198,14 +190,7 @@ export default function LoginPage() {
                   <Link
                     href="/register"
                     sx={{
-                      color: '#A3B899', // Exact green color from SVG
-                      textDecoration: 'none',
-                      fontWeight: 400,
                       fontSize: 'inherit',
-                      '&:hover': {
-                        textDecoration: 'underline',
-                        color: '#8FA68A',
-                      },
                     }}
                   >
                     Sign Up

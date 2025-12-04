@@ -10,6 +10,7 @@ import {
   Link,
   Alert,
   IconButton,
+  useTheme,
 } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
@@ -17,6 +18,7 @@ import AuthPageLayout from '@/components/auth/AuthPageLayout';
 
 export default function OTPPage() {
   const router = useRouter();
+  const theme = useTheme();
   const MOCK_VALID_OTP = '1234';
 
   const [otp, setOtp] = useState(['', '', '', '']);
@@ -162,7 +164,7 @@ export default function OTPPage() {
           width: 15,
           height: 15,
           borderRadius: '50%',
-          border: `1px solid ${selectedMethod === value ? '#D2A298' : '#E0E0E0'}`,
+          border: `1px solid ${selectedMethod === value ? theme.palette.primary.main : theme.palette.custom.border.radio}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -175,7 +177,7 @@ export default function OTPPage() {
               width: 9,
               height: 9,
               borderRadius: '50%',
-              backgroundColor: '#D2A298',
+              backgroundColor: theme.palette.primary.main,
             }}
           />
         )}
@@ -184,7 +186,7 @@ export default function OTPPage() {
         sx={{
           fontSize: { xs: '0.8125rem', sm: '0.875rem' },
           fontWeight: 400,
-          color: '#333333',
+          color: theme.palette.custom.heading.medium,
         }}
       >
         {label}
@@ -216,12 +218,12 @@ export default function OTPPage() {
             position: 'absolute',
             left: { xs: '-48px', sm: '-56px', md: '-64px' }, // Position near card edge accounting for 80% width + padding
             top: 0,
-            color: step === 'method' ? '#CCCCCC' : '#333333',
+            color: step === 'method' ? theme.palette.custom.status.disabled : theme.palette.custom.heading.medium,
             p: 0.5,
             zIndex: 1,
             cursor: step === 'method' ? 'not-allowed' : 'pointer',
             '&:disabled': {
-              color: '#CCCCCC',
+              color: theme.palette.custom.status.disabled,
             },
           }}
         >
@@ -233,7 +235,7 @@ export default function OTPPage() {
           variant="h4"
           sx={{
             fontWeight: 700,
-            color: '#333333',
+            color: theme.palette.custom.heading.medium,
             textAlign: 'center',
             mb: { xs: 2, sm: 2.5, md: 3 },
             fontSize: { xs: '1.5rem', sm: '2rem', md: '2rem' },
@@ -272,7 +274,7 @@ export default function OTPPage() {
           <Typography
             variant="body2"
             sx={{
-              color: '#747474',
+              color: theme.palette.custom.label.secondary,
               textAlign: 'center',
               mb: { xs: 4, sm: 5, md: 6 },
               fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
@@ -288,7 +290,7 @@ export default function OTPPage() {
           <Typography
             variant="body2"
             sx={{
-              color: '#B0B0B0',
+              color: theme.palette.custom.label.default,
               textAlign: 'center',
               mb: { xs: 4, sm: 5, md: 6 },
               fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
@@ -345,25 +347,25 @@ export default function OTPPage() {
                         mb: { xs: 4, sm: 5, md: 6 },
                         '& .MuiOutlinedInput-root': {
                           borderRadius: '10px',
-                          backgroundColor: '#FFFFFF',
+                          backgroundColor: theme.palette.custom.background.white,
                           '& fieldset': {
-                            borderColor: '#EDEDED',
+                            borderColor: theme.palette.custom.border.default,
                             borderWidth: '1px',
                           },
                           '&:hover fieldset': {
-                            borderColor: '#D1D5DB',
+                            borderColor: theme.palette.custom.border.hover,
                           },
                           '&.Mui-focused fieldset': {
-                            borderColor: '#D2A298',
+                            borderColor: theme.palette.custom.border.focus,
                             borderWidth: '1.5px',
                           },
                         },
                         '& .MuiInputBase-input': {
-                          color: '#041C2C',
+                          color: theme.palette.custom.heading.primary,
                           fontSize: { xs: '0.9375rem', sm: '1rem', md: '1.0625rem' },
                         },
                         '& .MuiInputLabel-root': {
-                          color: '#B0B0B0',
+                          color: theme.palette.custom.label.default,
                           fontSize: { xs: '0.9375rem', sm: '1rem', md: '1.0625rem' },
                         },
                       }}
@@ -383,25 +385,25 @@ export default function OTPPage() {
                         mb: { xs: 4, sm: 5, md: 6 },
                         '& .MuiOutlinedInput-root': {
                           borderRadius: '10px',
-                          backgroundColor: '#FFFFFF',
+                          backgroundColor: theme.palette.custom.background.white,
                           '& fieldset': {
-                            borderColor: '#EDEDED',
+                            borderColor: theme.palette.custom.border.default,
                             borderWidth: '1px',
                           },
                           '&:hover fieldset': {
-                            borderColor: '#D1D5DB',
+                            borderColor: theme.palette.custom.border.hover,
                           },
                           '&.Mui-focused fieldset': {
-                            borderColor: '#D2A298',
+                            borderColor: theme.palette.custom.border.focus,
                             borderWidth: '1.5px',
                           },
                         },
                         '& .MuiInputBase-input': {
-                          color: '#041C2C',
+                          color: theme.palette.custom.heading.primary,
                           fontSize: { xs: '0.9375rem', sm: '1rem', md: '1.0625rem' },
                         },
                         '& .MuiInputLabel-root': {
-                          color: '#B0B0B0',
+                          color: theme.palette.custom.label.default,
                           fontSize: { xs: '0.9375rem', sm: '1rem', md: '1.0625rem' },
                         },
                       }}
@@ -446,22 +448,22 @@ export default function OTPPage() {
                           fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' },
                           '& .MuiOutlinedInput-root': {
                             borderRadius: '7.5px',
-                            backgroundColor: '#FFFFFF',
+                            backgroundColor: theme.palette.custom.background.white,
                             height: { xs: '56px', sm: '64px', md: '72px' },
                             '& fieldset': {
-                              borderColor: error ? '#FF0000' : '#EDEDED',
+                              borderColor: error ? theme.palette.error.main : theme.palette.custom.border.default,
                               borderWidth: '1px',
                             },
                             '&:hover fieldset': {
-                              borderColor: error ? '#FF0000' : '#D1D5DB',
+                              borderColor: error ? theme.palette.error.main : theme.palette.custom.border.hover,
                             },
                             '&.Mui-focused fieldset': {
-                              borderColor: error ? '#FF0000' : '#D2A298',
+                              borderColor: error ? theme.palette.error.main : theme.palette.custom.border.focus,
                               borderWidth: '1.5px',
                             },
                           },
                           '& .MuiInputBase-input': {
-                            color: '#041C2C',
+                            color: theme.palette.custom.heading.primary,
                             fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' },
                             fontWeight: 700,
                           },
@@ -476,7 +478,7 @@ export default function OTPPage() {
                   <Grid size={{ xs: 12 }}>
                     <Typography
                       sx={{
-                        color: '#FF0000',
+                        color: theme.palette.error.main,
                         textAlign: 'center',
                         mb: { xs: 2, sm: 2.5, md: 3 },
                         fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
@@ -501,7 +503,7 @@ export default function OTPPage() {
                       variant="body2"
                       component="span"
                       sx={{
-                        color: '#B0B0B0',
+                        color: theme.palette.custom.label.default,
                         fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
                         fontWeight: 400,
                         lineHeight: 1.5,
@@ -516,7 +518,7 @@ export default function OTPPage() {
                           type="button"
                           onClick={handleResend}
                           sx={{
-                            color: '#A3B899',
+                            color: theme.palette.secondary.main,
                             textDecoration: 'none',
                             fontWeight: 400,
                             fontSize: 'inherit',
@@ -526,7 +528,7 @@ export default function OTPPage() {
                             padding: 0,
                             '&:hover': {
                               textDecoration: 'underline',
-                              color: '#8FA68A',
+                              color: theme.palette.secondary.light,
                             },
                           }}
                         >
@@ -539,7 +541,7 @@ export default function OTPPage() {
                         variant="body2"
                         component="span"
                         sx={{
-                          color: '#B0B0B0',
+                          color: theme.palette.custom.label.default,
                           fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
                           fontWeight: 400,
                           lineHeight: 1.5,
@@ -575,16 +577,8 @@ export default function OTPPage() {
                     textTransform: 'none',
                     fontSize: { xs: '0.9375rem', sm: '1rem', md: '1.0625rem' },
                     fontWeight: 700,
-                    backgroundColor: '#D2A298',
-                    color: '#FFFFFF',
+                    backgroundColor: theme.palette.primary.main,
                     boxShadow: 'none',
-                    '&:hover': {
-                      backgroundColor: '#C8968A',
-                      boxShadow: 'none',
-                    },
-                    '&:active': {
-                      backgroundColor: '#BE8A7C',
-                    },
                   }}
                 >
                   {step === 'method' ? 'Send OTP' : 'Confirm'}
