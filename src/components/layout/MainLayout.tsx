@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
+import { authStorage } from '@/lib/storage/authStorage';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -15,6 +16,21 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
+  // Client-side protection check (backup for middleware)
+  useEffect(() => {
+    // Check if token exists in both localStorage and cookie
+    const token = authStorage.getToken();
+    const cookieToken = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('auth_token='))
+      ?.split('=')[1];
+
+    // If no token in either storage, redirect to login
+    if (!token && !cookieToken) {
+      window.location.href = '/login';
+    }
+  }, []);
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>

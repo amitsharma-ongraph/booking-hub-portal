@@ -49,7 +49,7 @@ const menuItems: Omit<SidebarMenuItemProps, 'isActive' | 'onClick'>[] = [
 const logoutItem: Omit<SidebarMenuItemProps, 'isActive' | 'onClick'> = {
   label: 'Logout',
   icon: <LogoutIcon />, // Using Material-UI icon for logout
-  path: '/login',
+  path: '/logout',
   variant: 'logout',
 };
 
@@ -60,6 +60,8 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleNavigation = (path: string) => {
+    // For protected routes, ensure middleware runs by checking if we need full reload
+    // Middleware will handle protection, but we use normal navigation for better UX
     router.push(path);
     if (isMobile) {
       onClose();

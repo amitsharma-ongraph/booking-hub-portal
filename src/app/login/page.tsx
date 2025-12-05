@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
@@ -20,10 +20,13 @@ import AuthPageLayout from '@/components/auth/AuthPageLayout';
 import FormTextField from '@/components/forms/FormTextField';
 import FormButton from '@/components/forms/FormButton';
 import { loginSchema, type LoginFormData } from '@/lib/validations/schemas';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
   const router = useRouter();
   const theme = useTheme();
+  const { requestOtp, error, clearError, isLoading } = useAuthContext();
+  const [localError, setLocalError] = useState<string | null>(null);
 
   const {
     control,
@@ -38,11 +41,21 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      // TODO: Implement actual login logic
-      // await loginAPI(data);
+      clearError();
+      setLocalError(null);
+      
+      // Request OTP
+      await requestOtp(data.phoneNumber);
+      
+      // Navigate to OTP page
       router.push('/otp');
-    } catch (error) {
-      console.error('Login error:', error);
+    } catch (err) {
+      const apiError = err as { errorCode?: string; errorMessage?: string };
+      const errorMessage =
+        apiError.errorCode === 'entity-not-found'
+          ? 'User not found. Please register first.'
+          : apiError.errorMessage || 'Failed to request OTP. Please try again.';
+      setLocalError(errorMessage);
     }
   };
 
@@ -81,6 +94,15 @@ export default function LoginPage() {
           sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
         >
           <Grid container spacing={2.5}>
+            {/* Error Alert */}
+            {(error || localError) && (
+              <Grid size={{ xs: 12 }}>
+                <Alert severity="error" onClose={() => { clearError(); setLocalError(null); }}>
+                  {error || localError}
+                </Alert>
+              </Grid>
+            )}
+
             {/* Phone Number Input */}
             <Grid size={{ xs: 12 }}>
               <FormTextField
@@ -106,7 +128,7 @@ export default function LoginPage() {
 
             {/* Sign In Button */}
             <Grid size={{ xs: 12 }}>
-              <FormButton disabled={isSubmitting} sx={{ mt: { xs: 0.5, sm: 1 } }}>
+              <FormButton disabled={isSubmitting || isLoading} sx={{ mt: { xs: 0.5, sm: 1 } }}>
                 Sign In
               </FormButton>
             </Grid>

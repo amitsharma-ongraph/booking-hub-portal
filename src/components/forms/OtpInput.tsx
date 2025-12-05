@@ -17,7 +17,7 @@ export interface OtpInputProps<T extends FieldValues> {
 export default function OtpInput<T extends FieldValues>({
   name,
   control,
-  length = 4,
+  length = 6,
 }: OtpInputProps<T>) {
   const theme = useTheme();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);

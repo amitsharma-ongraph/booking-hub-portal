@@ -41,8 +41,8 @@ export const lastNameSchema = z
 // OTP validation
 export const otpSchema = z
   .string()
-  .length(4, 'Please enter the complete 4-digit OTP code')
-  .regex(/^\d{4}$/, 'OTP must contain only digits');
+  .length(6, 'Please enter the complete 6-digit OTP code')
+  .regex(/^\d{6}$/, 'OTP must contain only digits');
 
 // Terms acceptance validation
 export const termsSchema = z
