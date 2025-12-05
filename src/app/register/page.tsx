@@ -12,15 +12,18 @@ import {
 import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Alert } from '@mui/material';
 import AuthPageLayout from '@/components/auth/AuthPageLayout';
 import FormTextField from '@/components/forms/FormTextField';
 import FormCheckbox from '@/components/forms/FormCheckbox';
 import FormButton from '@/components/forms/FormButton';
 import { registerSchema, type RegisterFormData } from '@/lib/validations/schemas';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 export default function RegisterPage() {
   const router = useRouter();
   const theme = useTheme();
+  const { register, error, clearError, isLoading } = useAuthContext();
 
   const {
     control,
@@ -30,11 +33,11 @@ export default function RegisterPage() {
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      firstName: 'Arwa Khalifa',
+      firstName: '',
       lastName: '',
-      email: 'arwakhalifa@gmail.com',
+      email: '',
       countryCode: '+966',
-      phoneNumber: '62 2851 9092',
+      phoneNumber: '',
       termsAccepted: false,
     },
   });
@@ -43,10 +46,23 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      // TODO: Implement actual registration logic
-      // await registerAPI(data);
-      router.push('/otp');
+      clearError();
+      
+      // Combine country code and phone number
+      const fullPhoneNumber = `${data.countryCode}${data.phoneNumber.replace(/\s/g, '')}`;
+      
+      // Call registration API (termsAccepted is frontend-only validation)
+      await register({
+        emailAddress: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        phoneNumber: fullPhoneNumber,
+      });
+      
+      // Redirect to login on success
+      router.push('/login');
     } catch (error) {
+      // Error is handled by useAuthContext and displayed via error state
       console.error('Registration error:', error);
     }
   };
@@ -77,6 +93,13 @@ export default function RegisterPage() {
         >
           Register
         </Typography>
+
+        {/* Error Alert */}
+        {error && (
+          <Alert severity="error" onClose={clearError} sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
         <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ width: '100%' }}>
           <Grid container spacing={2.5}>
@@ -252,7 +275,7 @@ export default function RegisterPage() {
 
             {/* Sign Up Button */}
             <Grid size={{ xs: 12 }}>
-              <FormButton disabled={isSubmitting} sx={{ mt: { xs: 1, sm: 1.5 } }}>
+              <FormButton disabled={isSubmitting || isLoading} sx={{ mt: { xs: 1, sm: 1.5 } }}>
                 Sign Up
               </FormButton>
             </Grid>
