@@ -24,6 +24,7 @@ interface AuthContextType {
     firebaseToken?: string;
   }) => Promise<CustomerDto>;
   logout: () => void;
+  validateToken: () => Promise<boolean>;
   clearError: () => void;
 }
 

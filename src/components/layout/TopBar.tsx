@@ -19,7 +19,7 @@ import {
   AccountCircle,
 } from '@mui/icons-material';
 import Image from 'next/image';
-import { mockUser } from '@/data/mockData';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 interface TopBarProps {
   onMenuClick: () => void;
@@ -28,7 +28,15 @@ interface TopBarProps {
 export default function TopBar({ onMenuClick }: TopBarProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { user } = useAuthContext();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [mounted, setMounted] = React.useState(false);
+  const [imageError, setImageError] = React.useState(false);
+
+  // Handle client-side only rendering to avoid hydration mismatch
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -38,8 +46,27 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
     setAnchorEl(null);
   };
 
-  // User name from SVG design
-  const userName = 'Arwa Khalifa';
+  // Get user name from auth context (only after mount to avoid hydration issues)
+  const userName = mounted && user
+    ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.emailAddress
+    : '';
+  
+  // Get account number from user ID (last 9 characters for readability)
+  const accountNumber = mounted && user?.id 
+    ? `Account #${user.id.replace(/-/g, '').slice(-9)}` 
+    : '';
+  
+  // Get profile picture or fallback to default avatar
+  const profilePicture = mounted && user?.profilePicture && !imageError
+    ? user.profilePicture 
+    : '/images/avatar.svg';
+  
+  // Reset image error when user changes
+  React.useEffect(() => {
+    if (user?.profilePicture) {
+      setImageError(false);
+    }
+  }, [user?.profilePicture]);
 
   return (
     <AppBar
@@ -109,37 +136,41 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
           </IconButton>
 
           {/* Account Name and Number */}
-          <Box
-            sx={{
-              display: { xs: 'none', md: 'flex' },
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              gap: 0.25,
-            }}
-          >
-            <Typography
-              variant="body1"
+          {mounted && userName && (
+            <Box
               sx={{
-                color: theme.palette.custom.heading.dark,
-                fontSize: '0.875rem',
-                fontWeight: 400,
-                lineHeight: 1.5,
+                display: { xs: 'none', md: 'flex' },
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                gap: 0.25,
               }}
             >
-              {userName}
-            </Typography>
-            <Typography
-              variant="caption"
-              sx={{
-                color: theme.palette.custom.text.account,
-                fontSize: '0.75rem',
-                fontWeight: 400,
-                lineHeight: 1.5,
-              }}
-            >
-              Account #123456789
-            </Typography>
-          </Box>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: theme.palette.custom.heading.dark,
+                  fontSize: '0.875rem',
+                  fontWeight: 400,
+                  lineHeight: 1.5,
+                }}
+              >
+                {userName}
+              </Typography>
+              {accountNumber && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: theme.palette.custom.text.account,
+                    fontSize: '0.75rem',
+                    fontWeight: 400,
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {accountNumber}
+                </Typography>
+              )}
+            </Box>
+          )}
 
           {/* User Avatar */}
           <Box
@@ -154,19 +185,33 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
             }}
             onClick={handleMenu}
           >
-            <Image
-              src="/images/avatar.svg"
-              alt="User Avatar"
-              width={44.5131}
-              height={44.5131}
-              style={{
-                objectFit: 'cover',
-                width: '100%',
-                height: '100%',
-              }}
-              priority
-              unoptimized
-            />
+            {profilePicture.startsWith('http://') || profilePicture.startsWith('https://') ? (
+              // External URL (S3) - use regular img tag
+              <Box
+                component="img"
+                src={profilePicture}
+                alt={userName || 'User Avatar'}
+                onError={() => setImageError(true)}
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                }}
+              />
+            ) : (
+              // Local path - use Next.js Image
+              <Box
+                component="img"
+                src={profilePicture}
+                alt={userName || 'User Avatar'}
+                onError={() => setImageError(true)}
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                }}
+              />
+            )}
           </Box>
         </Box>
 

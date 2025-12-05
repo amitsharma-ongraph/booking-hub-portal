@@ -3,9 +3,10 @@
  * Manages authentication state and provides auth-related functions
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { authService } from '@/lib/api/auth/authService';
 import { authStorage } from '@/lib/storage/authStorage';
+import { decodeJwt, isTokenExpired, getUserIdFromToken } from '@/lib/utils/jwt';
 import type { ApiError } from '@/lib/api/client';
 import type { CustomerDto, CustomerCreationDto } from '@/lib/api/auth/types';
 
@@ -17,12 +18,75 @@ interface AuthState {
 }
 
 export function useAuth() {
-  const [state, setState] = useState<AuthState>({
-    isAuthenticated: !!authStorage.getToken(),
-    isLoading: false,
-    user: (authStorage.getUser() as CustomerDto) || null,
-    error: null,
+  // Initialize state and validate token on mount
+  const [state, setState] = useState<AuthState>(() => {
+    const token = authStorage.getToken();
+    const isValid = token && !isTokenExpired(token);
+    
+    return {
+      isAuthenticated: !!isValid,
+      isLoading: false,
+      user: isValid ? (authStorage.getUser() as CustomerDto) || null : null,
+      error: null,
+    };
   });
+
+  // Validate token and refresh user data on mount
+  useEffect(() => {
+    const token = authStorage.getToken();
+    if (!token) {
+      setState((prev) => ({ ...prev, isAuthenticated: false, user: null }));
+      return;
+    }
+
+    // Check if token is expired
+    if (isTokenExpired(token)) {
+      authStorage.clearAll();
+      setState({
+        isAuthenticated: false,
+        isLoading: false,
+        user: null,
+        error: null,
+      });
+      return;
+    }
+
+    // If we have token but no user data, fetch it
+    const storedUser = authStorage.getUser();
+    if (!storedUser) {
+      const phoneNumber = getUserIdFromToken(token);
+      if (phoneNumber) {
+        setState((prev) => ({ ...prev, isLoading: true }));
+        authService
+          .getCustomerByPhone(phoneNumber)
+          .then((customers) => {
+            if (customers.length > 0) {
+              const user = customers[0];
+              authStorage.setUser(user);
+              setState((prev) => ({
+                ...prev,
+                isAuthenticated: true,
+                user,
+                isLoading: false,
+              }));
+            } else {
+              setState((prev) => ({
+                ...prev,
+                isAuthenticated: false,
+                isLoading: false,
+              }));
+            }
+          })
+          .catch(() => {
+            setState((prev) => ({
+              ...prev,
+              isAuthenticated: false,
+              isLoading: false,
+            }));
+          });
+      }
+    }
+  }, []); // Only run on mount
 
   /**
    * Set loading state
@@ -89,8 +153,12 @@ export function useAuth() {
         // Store token
         authStorage.setToken(authResponse.token);
 
-        // Get user details by phone number
-        const customers = await authService.getCustomerByPhone(phoneNumber);
+        // Decode JWT to get phone number (for verification)
+        const tokenPayload = decodeJwt(authResponse.token);
+        const tokenPhoneNumber = tokenPayload?.sub || phoneNumber;
+
+        // Get user details by phone number from token
+        const customers = await authService.getCustomerByPhone(tokenPhoneNumber);
         if (customers.length > 0) {
           const user = customers[0];
           authStorage.setUser(user);
@@ -164,6 +232,78 @@ export function useAuth() {
   }, []);
 
   /**
+   * Validate token and refresh user data
+   * Useful for checking token validity on app load or after token refresh
+   */
+  const validateToken = useCallback(async (): Promise<boolean> => {
+    const token = authStorage.getToken();
+    if (!token) {
+      setState((prev) => ({
+        ...prev,
+        isAuthenticated: false,
+        user: null,
+      }));
+      return false;
+    }
+
+    // Check if token is expired
+    if (isTokenExpired(token)) {
+      authStorage.clearAll();
+      setState((prev) => ({
+        ...prev,
+        isAuthenticated: false,
+        user: null,
+      }));
+      return false;
+    }
+
+    // Get phone number from token
+    const phoneNumber = getUserIdFromToken(token);
+    if (!phoneNumber) {
+      setState((prev) => ({
+        ...prev,
+        isAuthenticated: false,
+        user: null,
+      }));
+      return false;
+    }
+
+    // Refresh user data
+    try {
+      setState((prev) => ({ ...prev, isLoading: true }));
+      const customers = await authService.getCustomerByPhone(phoneNumber);
+      if (customers.length > 0) {
+        const user = customers[0];
+        authStorage.setUser(user);
+        setState((prev) => ({
+          ...prev,
+          isAuthenticated: true,
+          user,
+          isLoading: false,
+        }));
+        return true;
+      } else {
+        setState((prev) => ({
+          ...prev,
+          isAuthenticated: false,
+          user: null,
+          isLoading: false,
+        }));
+        return false;
+      }
+    } catch (error) {
+      setState((prev) => ({
+        ...prev,
+        isAuthenticated: false,
+        user: null,
+        isLoading: false,
+        error: (error as ApiError).errorMessage || 'Failed to validate token',
+      }));
+      return false;
+    }
+  }, []);
+
+  /**
    * Clear error
    */
   const clearError = useCallback(() => {
@@ -182,6 +322,7 @@ export function useAuth() {
     verifyOtpAndLogin,
     register,
     logout,
+    validateToken,
     clearError,
   };
 }
