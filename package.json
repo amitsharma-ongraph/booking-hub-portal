@@ -16,7 +16,7 @@
     "@mui/material": "^7.3.6",
     "@mui/x-date-pickers": "^8.19.0",
     "date-fns": "^4.1.0",
-    "next": "16.0.6",
+    "next": "16.0.7",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-hook-form": "^7.67.0",
@@ -28,7 +28,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.0.6",
+    "eslint-config-next": "16.0.7",
     "typescript": "^5"
   }
 }
