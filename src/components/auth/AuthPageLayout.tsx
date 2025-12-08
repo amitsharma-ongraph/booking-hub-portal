@@ -30,14 +30,13 @@ export default function AuthPageLayout({ children, cardHeight }: AuthPageLayoutP
         component="div"
         sx={{
           position: 'absolute',
-          top: 0,
-          right: -220,
-          width: { xs: '50%', sm: '45%', md: '40%', lg: '35%' },
-          height: { xs: '40%', sm: '45%', md: '50%' },
+          top: -300,
+          right:'-325px',
+          width: "1046px",
+          height: "1046px",
           opacity: 0.18,
           zIndex: 0,
           transform: 'rotateY(180deg)',
-          scale:1.5,
           backgroundImage: 'url(/images/login/leaves-decoration.svg)',
           backgroundSize: 'contain',
           backgroundRepeat: 'no-repeat',
@@ -52,10 +51,10 @@ export default function AuthPageLayout({ children, cardHeight }: AuthPageLayoutP
         component="div"
         sx={{
           position: 'absolute',
-          bottom: 0,
-          left: 0,
-          width: { xs: '50%', sm: '45%', md: '40%', lg: '35%' },
-          height: { xs: '40%', sm: '45%', md: '50%' },
+          bottom: -580,
+          left: -200,
+          width: 1046,
+          height: 1046,
           opacity: 0.18,
           zIndex: 0,
           backgroundImage: 'url(/images/login/leaves-decoration.svg)',
@@ -102,7 +101,7 @@ export default function AuthPageLayout({ children, cardHeight }: AuthPageLayoutP
           width: { 
             xs: 'calc(100% - 32px)', 
             sm: 'min(585px, calc(100% - 48px))',
-            md: 'min(585px, 40.625vw)', // 585/1440 = 40.625%
+            md: 585, // Fixed 585px from 900px+ to match 1200px+ behavior
             lg: 585 
           },
           maxWidth: 585,

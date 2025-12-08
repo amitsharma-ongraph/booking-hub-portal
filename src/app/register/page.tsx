@@ -36,7 +36,6 @@ export default function RegisterPage() {
       firstName: '',
       lastName: '',
       email: '',
-      countryCode: '+966',
       phoneNumber: '',
       termsAccepted: false,
     },
@@ -48,8 +47,8 @@ export default function RegisterPage() {
     try {
       clearError();
       
-      // Combine country code and phone number
-      const fullPhoneNumber = `${data.countryCode}${data.phoneNumber.replace(/\s/g, '')}`;
+      // Always prepend +966 for Saudi numbers
+      const fullPhoneNumber = `+966${data.phoneNumber.replace(/\s/g, '')}`;
       
       // Call registration API (termsAccepted is frontend-only validation)
       await register({
@@ -121,29 +120,15 @@ export default function RegisterPage() {
                 label="Last Name"
                 placeholder="Input your last name"
               />
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
-                {errors.lastName && (
-                  <Typography
-                    sx={{
-                      color: theme.palette.error.main,
-                      fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
-                      fontWeight: 400,
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    {errors.lastName.message}
-                  </Typography>
-                )}
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: 1 }}>
                 <Typography
                   sx={{
                     color: theme.palette.custom.label.default,
                     fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
                     fontWeight: 400,
                     lineHeight: 1.5,
-                    ml: 'auto',
                   }}
                 >
-                  {lastName?.length || 0}/50
                 </Typography>
               </Box>
             </Grid>
@@ -167,76 +152,149 @@ export default function RegisterPage() {
                   color: theme.palette.custom.label.default,
                   fontWeight: 400,
                   mb: 1.5,
-                  fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
+                  fontSize: '0.75rem', // 12px - handled by theme
                   lineHeight: 1.5,
                 }}
               >
                 Phone Number
               </Typography>
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                <Controller
-                  name="countryCode"
-                  control={control}
-                  render={({ field, fieldState: { error } }) => (
-                    <TextField
-                      {...field}
-                      error={!!error}
-                      sx={{
-                        width: { xs: '100px', sm: '120px' },
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: '7.5px',
-                          backgroundColor: theme.palette.custom.background.white,
-                          height: { xs: '44px', sm: '44px', md: '44px' },
-                          fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
-                          '& fieldset': {
-                            borderColor: error
-                              ? theme.palette.error.main
-                              : theme.palette.custom.border.default,
-                            borderWidth: '1px',
+              <Controller
+                name="phoneNumber"
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <>
+                    <Box sx={{ display: 'flex', gap: 0 }}>
+                      <TextField
+                        value="+966"
+                        disabled
+                        sx={{
+                          width: '60px', // Exact width from SVG
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: '8.5px 0 0 8.5px', // Rounded left corners only, 8.5px from SVG
+                            backgroundColor: '#EDEDED', // Gray background from SVG
+                            height: '46px', // Exact height from SVG
+                            padding: '0 8px',
+                            // fontSize handled by theme global override
+                            '& fieldset': {
+                              borderColor: '#D2A298', // Primary color border from SVG
+                              borderWidth: '1px',
+                              borderRight: 'none', // Remove right border to connect with phone input
+                            },
+                            '&.Mui-disabled': {
+                              backgroundColor: '#EDEDED',
+                              '& fieldset': {
+                                borderColor: theme.palette.custom.border.default,
+                              },
+                            },
                           },
-                          '&:hover fieldset': {
-                            borderColor: error
-                              ? theme.palette.error.main
-                              : theme.palette.custom.border.hover,
+                          '& .MuiInputBase-input': {
+                            color: '#333333', // Text color from SVG
+                            py: 0,
+                            px: 0,
+                            textAlign: 'center',
+                            // fontSize handled by theme global override
+                            '&.Mui-disabled': {
+                              color: '#333333',
+                              WebkitTextFillColor: '#333333',
+                            },
                           },
-                          '&.Mui-focused fieldset': {
-                            borderColor: error
-                              ? theme.palette.error.main
-                              : theme.palette.custom.border.focus,
-                            borderWidth: error ? '1px' : '1.5px',
+                        }}
+                      />
+                      <TextField
+                        {...field}
+                        type="tel"
+                        placeholder="Input your phone number"
+                        fullWidth
+                        error={!!error}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: '0 8.5px 8.5px 0', // Rounded right corners only, 8.5px from SVG
+                            backgroundColor: theme.palette.custom.background.white,
+                            height: '46px', // Exact height from SVG
+                            // fontSize handled by theme global override
+                            '& fieldset': {
+                              borderColor: error
+                                ? theme.palette.error.main
+                                : theme.palette.custom.border.default,
+                              borderWidth: '1px',
+                              borderLeft: 'none', // Remove left border to connect with country code
+                            },
+                            '&:hover fieldset': {
+                              borderColor: error
+                                ? theme.palette.error.main
+                                : theme.palette.custom.border.hover,
+                            },
+                            '&.Mui-focused fieldset': {
+                              borderColor: error
+                                ? theme.palette.error.main
+                                : theme.palette.custom.border.focus,
+                              borderWidth: error ? '1px' : '1.5px',
+                              borderLeft: 'none',
+                            },
+                            '&.Mui-error fieldset': {
+                              borderColor: theme.palette.error.main,
+                              borderLeft: 'none',
+                            },
+                            '&.Mui-error:hover fieldset': {
+                              borderColor: theme.palette.error.main,
+                              borderLeft: 'none',
+                            },
+                            '&.Mui-error.Mui-focused fieldset': {
+                              borderColor: theme.palette.error.main,
+                              borderLeft: 'none',
+                            },
                           },
-                        },
-                        '& .MuiInputBase-input': {
-                          color: theme.palette.custom.heading.primary,
-                          py: { xs: 1.25, sm: 1.5 },
-                          px: 1,
-                          textAlign: 'center',
-                        },
-                      }}
-                    />
-                  )}
-                />
-                <FormTextField
-                  name="phoneNumber"
-                  control={control}
-                  type="tel"
-                  placeholder="Input your phone number"
-                  showLabel={false}
-                />
-              </Box>
-              {errors.phoneNumber && (
-                <Typography
-                  sx={{
-                    color: theme.palette.error.main,
-                    mt: 1,
-                    fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
-                    fontWeight: 400,
-                    lineHeight: 1.5,
-                  }}
-                >
-                  {errors.phoneNumber.message}
-                </Typography>
-              )}
+                          '& .MuiInputBase-input': {
+                            color: theme.palette.custom.heading.primary,
+                            py: 0,
+                            px: 1,
+                            '&::placeholder': {
+                              color: theme.palette.custom.label.default,
+                              opacity: 1,
+                              // fontSize handled by theme global override
+                            },
+                          },
+                        }}
+                        inputProps={{
+                          maxLength: 9,
+                          onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => {
+                            // Allow: backspace, delete, tab, escape, enter, home, end, left, right arrow keys
+                            const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'];
+                            if (allowedKeys.includes(e.key)) {
+                              return;
+                            }
+                            // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+                            if ((e.key === 'a' || e.key === 'c' || e.key === 'v' || e.key === 'x') && e.ctrlKey) {
+                              return;
+                            }
+                            // Only allow numbers
+                            if (!/^[0-9]$/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                          },
+                          onInput: (e: React.ChangeEvent<HTMLInputElement>) => {
+                            // Only allow numbers, max 9 digits
+                            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 9);
+                          },
+                        }}
+                      />
+                    </Box>
+                    {error && (
+                      <Typography
+                        sx={{
+                          color: theme.palette.error.main,
+                          mt: 1,
+                          fontSize: '0.75rem', // 12px - handled by theme
+                          fontWeight: 400,
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {error.message}
+                      </Typography>
+                    )}
+                  </>
+                )}
+              />
             </Grid>
 
             {/* Terms & Conditions */}
@@ -252,17 +310,18 @@ export default function RegisterPage() {
                       fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
                       fontWeight: 400,
                       lineHeight: 1.5,
+                      marginLeft:"10px"
                     }}
                   >
                     I agree with{' '}
                     <Link
                       href="#"
                       sx={{
-                        color: theme.palette.custom.heading.medium,
-                        textDecoration: 'underline',
+                        color: theme.palette.secondary.main,
                         fontWeight: 400,
                         '&:hover': {
-                          color: theme.palette.custom.heading.primary,
+                          color: theme.palette.secondary.main,
+                          fontWeight:600
                         },
                       }}
                     >

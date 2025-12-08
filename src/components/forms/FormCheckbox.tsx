@@ -42,9 +42,13 @@ export default function FormCheckbox<T extends FieldValues>({
                 {...field}
                 checked={field.value || false}
                 sx={{
+                  padding: 0,
                   color: error ? theme.palette.error.main : theme.palette.primary.main,
                   '&.Mui-checked': {
                     color: error ? theme.palette.error.main : theme.palette.primary.main,
+                  },
+                  '&:not(.Mui-checked)': {
+                    color: theme.palette.custom.border.default, // Match input border color when unchecked
                   },
                   '& .MuiSvgIcon-root': {
                     fontSize: { xs: '1.25rem', sm: '1.5rem' },

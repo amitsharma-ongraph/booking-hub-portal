@@ -44,8 +44,11 @@ export default function LoginPage() {
       clearError();
       setLocalError(null);
       
+      // Always prepend +966 for Saudi numbers
+      const fullPhoneNumber = `+966${data.phoneNumber.replace(/\s/g, '')}`;
+      
       // Request OTP
-      await requestOtp(data.phoneNumber);
+      await requestOtp(fullPhoneNumber);
       
       // Navigate to OTP page
       router.push('/otp');
@@ -112,16 +115,28 @@ export default function LoginPage() {
                 type="tel"
                 placeholder="Input your phone number"
                 InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start" sx={{ ml: 1 }}>
-                      <PhoneIcon
-                        sx={{
-                          color: theme.palette.custom.label.default,
-                          fontSize: { xs: '1.125rem', sm: '1.25rem', md: '1.375rem' },
-                        }}
-                      />
-                    </InputAdornment>
-                  ),
+                  inputProps: {
+                    maxLength: 9,
+                    onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => {
+                      // Allow: backspace, delete, tab, escape, enter, home, end, left, right arrow keys
+                      const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'];
+                      if (allowedKeys.includes(e.key)) {
+                        return;
+                      }
+                      // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+                      if ((e.key === 'a' || e.key === 'c' || e.key === 'v' || e.key === 'x') && e.ctrlKey) {
+                        return;
+                      }
+                      // Only allow numbers
+                      if (!/^[0-9]$/.test(e.key)) {
+                        e.preventDefault();
+                      }
+                    },
+                    onInput: (e: React.ChangeEvent<HTMLInputElement>) => {
+                      // Only allow numbers, max 9 digits
+                      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 9);
+                    },
+                  },
                 }}
               />
             </Grid>

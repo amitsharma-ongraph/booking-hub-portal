@@ -126,6 +126,12 @@ const theme = createTheme({
       account: '#808080', // Account number text
       subtitle: '#6A7282', // Dashboard subtitle
     },
+    // Form font sizes
+    form: {
+      input: '0.875rem', // 14px for input values and placeholders
+      label: '0.75rem', // 12px for labels
+      error: '0.75rem', // 12px for error messages
+    },
   },
   },
   typography: {
@@ -220,6 +226,7 @@ const theme = createTheme({
           '& .MuiOutlinedInput-root': {
             borderRadius: '7.5px', // Match input border radius from design
             backgroundColor: '#FFFFFF',
+            fontSize: '0.875rem', // 14px for input values
             '& fieldset': {
               borderColor: '#EDEDED', // Default border
               borderWidth: '1px',
@@ -244,14 +251,25 @@ const theme = createTheme({
           },
           '& .MuiInputBase-input': {
             color: '#041C2C', // Text color
+            fontSize: '0.875rem', // 14px for input values
             '&::placeholder': {
               color: '#B0B0B0', // Placeholder color
               opacity: 1,
+              fontSize: '0.875rem', // 14px for placeholders
             },
           },
           '& .MuiInputLabel-root': {
             color: '#B0B0B0', // Label color
+            fontSize: '0.75rem', // 12px for labels
           },
+        },
+      },
+    },
+    MuiFormHelperText: {
+      styleOverrides: {
+        root: {
+          fontSize: '0.75rem', // 12px for error messages
+          marginTop: '8px',
         },
       },
     },
@@ -354,6 +372,11 @@ declare module '@mui/material/styles' {
         account: string;
         subtitle: string;
       };
+      form: {
+        input: string;
+        label: string;
+        error: string;
+      };
     };
   }
 
@@ -402,6 +425,11 @@ declare module '@mui/material/styles' {
         service?: string;
         account?: string;
         subtitle?: string;
+      };
+      form?: {
+        input?: string;
+        label?: string;
+        error?: string;
       };
     };
   }

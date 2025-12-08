@@ -33,7 +33,7 @@ export default function FormTextField<T extends FieldValues>({
             color: theme.palette.custom.label.default,
             fontWeight: 400,
             mb: 1.5,
-            fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
+            fontSize: '0.75rem', // 12px - handled by theme
             lineHeight: 1.5,
           }}
         >
@@ -55,7 +55,7 @@ export default function FormTextField<T extends FieldValues>({
                   borderRadius: '7.5px',
                   backgroundColor: theme.palette.custom.background.white,
                   height: { xs: '44px', sm: '44px', md: '44px' },
-                  fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
+                  // fontSize handled by theme global override
                   '& fieldset': {
                     borderColor: error
                       ? theme.palette.error.main
@@ -90,7 +90,7 @@ export default function FormTextField<T extends FieldValues>({
                   '&::placeholder': {
                     color: theme.palette.custom.label.default,
                     opacity: 1,
-                    fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1rem' },
+                    // fontSize handled by theme global override
                   },
                 },
                 ...textFieldProps.sx,
@@ -101,7 +101,7 @@ export default function FormTextField<T extends FieldValues>({
                 sx={{
                   color: theme.palette.error.main,
                   mt: 1,
-                  fontSize: { xs: '0.8125rem', sm: '0.875rem', md: '0.9375rem' },
+                  fontSize: '0.75rem', // 12px - handled by theme
                   fontWeight: 400,
                   lineHeight: 1.5,
                 }}
