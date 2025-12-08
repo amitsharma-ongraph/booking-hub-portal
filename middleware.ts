@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 /**
  * Public routes that don't require authentication
  */
-const publicRoutes = ['/login', '/register', '/otp', '/logout'];
+const publicRoutes = ['/login', '/register', '/register-success', '/otp', '/logout'];
 
 /**
  * Check if a route is public (exact match or starts with)

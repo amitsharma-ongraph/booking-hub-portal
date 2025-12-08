@@ -58,8 +58,8 @@ export default function RegisterPage() {
         phoneNumber: fullPhoneNumber,
       });
       
-      // Redirect to login on success
-      router.push('/login');
+      // Redirect to success page on success
+      router.push('/register-success');
     } catch (error) {
       // Error is handled by useAuthContext and displayed via error state
       console.error('Registration error:', error);
