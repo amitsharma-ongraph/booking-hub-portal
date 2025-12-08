@@ -1,32 +1,28 @@
 'use client';
 
 import React from 'react';
-import { Box, Button, Typography, Paper } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 import Image from 'next/image';
 
-interface ThirdOnboardingScreenProps {
-  onNext: () => void;
-  onSkip: () => void;
-}
+interface ThirdOnboardingScreenProps {}
 
 interface LocationCardProps {
   imageSrc: string;
   alt: string;
   position: {
-    top?: { xs: string; sm: string };
-    bottom?: { xs: string; sm: string };
-    left?: { xs: string; sm: string };
-    right?: { xs: string; sm: string };
+    top?: { xs: string; sm: string; md: string; lg: string };
+    bottom?: { xs: string; sm: string; md: string; lg: string };
+    left?: { xs: string; sm: string; md: string; lg: string };
+    right?: { xs: string; sm: string; md: string; lg: string };
   };
   size: {
-    widthXs: number;
-    widthSm: number;
-    heightXs: number;
-    heightSm: number;
+    width: { xs: number; sm: number; md: number; lg: number };
+    height: { xs: number; sm: number; md: number; lg: number };
   };
+  animation?: string;
 }
 
-function LocationCard({ imageSrc, alt, position, size }: LocationCardProps) {
+function LocationCard({ imageSrc, alt, position, size, animation }: LocationCardProps) {
   return (
     <Box
       sx={{
@@ -37,35 +33,36 @@ function LocationCard({ imageSrc, alt, position, size }: LocationCardProps) {
         zIndex: 1,
         ...position,
         transform: 'translateY(0)',
+        ...(animation && { animation }),
       }}
     >
-      {/* Pin above card */}
+      {/* Pin above card - responsive */}
       <Box
         sx={{
-          width: 32,
-          height: 40,
+          width: { xs: 20, sm: 24, md: 28, lg: 32 },
+          height: { xs: 25, sm: 30, md: 35, lg: 40 },
           position: 'relative',
-          mb: 1,
+          mb: { xs: 0.5, sm: 0.75, md: 1 },
         }}
       >
         <Image
           src="/images/onboarding/page3-pin.svg"
           alt="Location pin"
           fill
-          sizes="32px"
+          sizes="(max-width: 600px) 20px, (max-width: 960px) 28px, 32px"
           style={{ objectFit: 'contain' }}
           unoptimized
         />
       </Box>
 
-      {/* Card with image */}
+      {/* Card with image - responsive pixel sizes */}
       <Paper
         elevation={0}
         sx={{
-          width: { xs: size.widthXs, sm: size.widthSm },
-          height: { xs: size.heightXs, sm: size.heightSm },
+          width: { xs: size.width.xs, sm: size.width.sm, md: size.width.md, lg: size.width.lg },
+          height: { xs: size.height.xs, sm: size.height.sm, md: size.height.md, lg: size.height.lg },
           position: 'relative',
-          borderRadius: '21.8px',
+          borderRadius: { xs: '16px', sm: '18px', md: '21.8px' },
           overflow: 'hidden',
           backgroundColor: '#EDEDED',
           boxShadow: '0px 0px 29px rgba(215, 215, 215, 0.5)',
@@ -75,7 +72,7 @@ function LocationCard({ imageSrc, alt, position, size }: LocationCardProps) {
           src={imageSrc}
           alt={alt}
           fill
-          sizes="210px"
+          sizes="(max-width: 600px) 125px, (max-width: 960px) 175px, 200px"
           style={{ objectFit: 'cover' }}
           unoptimized
         />
@@ -84,199 +81,134 @@ function LocationCard({ imageSrc, alt, position, size }: LocationCardProps) {
   );
 }
 
-export default function ThirdOnboardingScreen({
-  onNext,
-  onSkip,
-}: ThirdOnboardingScreenProps) {
+export default function ThirdOnboardingScreen({}: ThirdOnboardingScreenProps) {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
+        width: '100%',
+        height: '100%',
+        maxWidth: { xs: '100%', sm: 650, md: 800, lg: 950 },
+        p: { xs: 1, sm: 2, md: 3, lg: 4 },
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#FFFFFF',
-        p: { xs: 2, sm: 3, md: 4 },
+        position: 'relative',
+        overflow: 'visible',
       }}
     >
+      {/* Map background block - positioning context for cards */}
       <Box
         sx={{
           width: '100%',
-          maxWidth: 960,
-          p: { xs: 3, sm: 4, md: 6 },
+          aspectRatio: '16 / 9',
+          borderRadius: { xs: 8, sm: 10, md: 12 },
+          overflow: 'visible',
           position: 'relative',
-          overflow: 'hidden',
+          '@keyframes fadeInScale': {
+            '0%': {
+              opacity: 0,
+              transform: 'scale(0.95)',
+            },
+            '100%': {
+              opacity: 1,
+              transform: 'scale(1)',
+            },
+          },
+          '@keyframes slideInFromLeft': {
+            '0%': {
+              opacity: 0,
+              transform: 'translateX(-40px) translateY(0)',
+            },
+            '100%': {
+              opacity: 1,
+              transform: 'translateX(0) translateY(0)',
+            },
+          },
+          '@keyframes slideInFromRight': {
+            '0%': {
+              opacity: 0,
+              transform: 'translateX(40px) translateY(0)',
+            },
+            '100%': {
+              opacity: 1,
+              transform: 'translateX(0) translateY(0)',
+            },
+          },
+          '@keyframes slideInFromBottom': {
+            '0%': {
+              opacity: 0,
+              transform: 'translateY(40px)',
+            },
+            '100%': {
+              opacity: 1,
+              transform: 'translateY(0)',
+            },
+          },
         }}
       >
-        {/* Map background block */}
+        {/* Map image container */}
         <Box
           sx={{
             width: '100%',
-            aspectRatio: '16 / 9',
-            borderRadius: 40,
-            overflow: 'hidden',
+            height: '100%',
             position: 'relative',
-            mb: { xs: 4, sm: 5 },
+            borderRadius: 'inherit',
+            overflow: 'hidden',
+            animation: 'fadeInScale 0.8s ease-out 0.2s both',
           }}
         >
           <Image
             src="/images/onboarding/page3-map.png"
             alt="Nearby wellness locations"
             fill
-            sizes="(max-width: 768px) 100vw, 960px"
+            sizes="(max-width: 600px) 100vw, (max-width: 960px) 80vw, 950px"
             style={{ objectFit: 'cover' }}
             unoptimized
           />
         </Box>
 
-        {/* Location cards with integrated pins (pin just above each card), allowed to overflow map */}
+        {/* Location cards with integrated pins - positioned relative to map container */}
         <LocationCard
           imageSrc="/images/onboarding/page3-card-top-left.png"
           alt="Top left location"
           position={{
-            top: { xs: '10%', sm: '12%' },
-            left: { xs: '6%', sm: '10%' },
+            top: { xs: '8%', sm: '10%', md: '12%', lg: '12%' },
+            left: { xs: '4%', sm: '6%', md: '8%', lg: '-3%' },
           }}
           size={{
-            widthXs: 140,
-            widthSm: 170,
-            heightXs: 70,
-            heightSm: 80,
+            width: { xs: 100, sm: 125, md: 140, lg: 165 },
+            height: { xs: 50, sm: 60, md: 65, lg: 80 },
           }}
+          animation="slideInFromLeft 0.8s ease-out 0.6s both"
         />
 
         <LocationCard
           imageSrc="/images/onboarding/page3-card-bottom-left.jpg"
           alt="Bottom left location"
           position={{
-            top: { xs: '52%', sm: '54%' },
-            left: { xs: '10%', sm: '14%' },
+            top: { xs: '50%', sm: '52%', md: '54%', lg: '60%' },
+            left: { xs: '6%', sm: '10%', md: '12%', lg: '8%' },
           }}
           size={{
-            widthXs: 180,
-            widthSm: 210,
-            heightXs: 80,
-            heightSm: 90,
+            width: { xs: 125, sm: 150, md: 175, lg: 200 },
+            height: { xs: 60, sm: 70, md: 75, lg: 90 },
           }}
+          animation="slideInFromBottom 0.8s ease-out 0.8s both"
         />
 
         <LocationCard
           imageSrc="/images/onboarding/page3-card-right.jpg"
           alt="Right location"
           position={{
-            top: { xs: '24%', sm: '26%' },
-            right: { xs: '4%', sm: '8%' },
+            top: { xs: '22%', sm: '24%', md: '26%', lg: '26%' },
+            right: { xs: '2%', sm: '4%', md: '6%', lg: '-3%' },
           }}
           size={{
-            widthXs: 160,
-            widthSm: 190,
-            heightXs: 75,
-            heightSm: 85,
+            width: { xs: 110, sm: 135, md: 160, lg: 185 },
+            height: { xs: 55, sm: 65, md: 70, lg: 85 },
           }}
+          animation="slideInFromRight 0.8s ease-out 1s both"
         />
-
-        {/* Content section */}
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            textAlign: 'center',
-          }}
-        >
-          {/* Pager dots (third active) */}
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 1,
-              mb: { xs: 2, sm: 2.5 },
-            }}
-          >
-            <Box
-              sx={{
-                width: 6,
-                height: 6,
-                borderRadius: '50%',
-                backgroundColor: '#D8D8D8',
-              }}
-            />
-            <Box
-              sx={{
-                width: 6,
-                height: 6,
-                borderRadius: '50%',
-                backgroundColor: '#D8D8D8',
-              }}
-            />
-            <Box
-              sx={{
-                width: 20,
-                height: 6,
-                borderRadius: 999,
-                backgroundColor: '#D2A298',
-              }}
-            />
-          </Box>
-
-          <Typography
-            sx={{
-              fontSize: { xs: '1.4rem', sm: '1.6rem', md: '1.8rem' },
-              fontWeight: 600,
-              color: '#333333',
-              mb: 1.5,
-            }}
-          >
-            Unlock Your Inner Goddess
-          </Typography>
-
-          <Typography
-            sx={{
-              fontSize: { xs: '0.85rem', sm: '0.9rem' },
-              color: '#8B8B8B',
-              mb: { xs: 3, sm: 3.5 },
-              maxWidth: 420,
-            }}
-          >
-            Embrace Your True Power and Beauty with Confidence
-          </Typography>
-
-          <Button
-            variant="contained"
-            fullWidth={false}
-            onClick={onNext}
-            sx={{
-              minWidth: 260,
-              maxWidth: 320,
-              height: 44,
-              borderRadius: 999,
-              backgroundColor: '#D2A298',
-              color: '#FFFFFF',
-              textTransform: 'none',
-              fontWeight: 600,
-              fontSize: '0.95rem',
-              mb: 1.5,
-              '&:hover': {
-                backgroundColor: '#C8968A',
-              },
-            }}
-          >
-            Next
-          </Button>
-
-          <Button
-            variant="text"
-            onClick={onSkip}
-            sx={{
-              color: '#8B8B8B',
-              textTransform: 'none',
-              fontSize: '0.9rem',
-            }}
-          >
-            Skip
-          </Button>
-        </Box>
       </Box>
     </Box>
   );

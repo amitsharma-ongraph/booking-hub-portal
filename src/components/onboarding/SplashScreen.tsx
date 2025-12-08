@@ -49,10 +49,10 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
         component="div"
         sx={{
           position: 'absolute',
-          top: 0,
-          left: 0,
-          width: { xs: '50%', sm: '45%', md: '40%', lg: '35%' },
-          height: { xs: '40%', sm: '45%', md: '50%' },
+          top: 100,
+          left: 50,
+          width: '544px',
+          height: '544px',
           zIndex: 0,
           transform: 'translate(-10%, -10%)',
           backgroundImage: 'url(/images/onboarding/leaves-decoration.svg)',
@@ -69,10 +69,10 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
         component="div"
         sx={{
           position: 'absolute',
-          bottom: 0,
-          right: 0,
-          width: { xs: '50%', sm: '45%', md: '40%', lg: '35%' },
-          height: { xs: '40%', sm: '45%', md: '50%' },          zIndex: 0,
+          bottom: -40,
+          right: -120,
+          width: '544px',
+          height: '544px',          zIndex: 0,
           transform: 'translate(10%, 10%) scaleX(-1)',
           backgroundImage: 'url(/images/onboarding/leaves-decoration.svg)',
           backgroundSize: 'contain',

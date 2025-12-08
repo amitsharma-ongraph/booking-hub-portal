@@ -100,7 +100,7 @@ export default function OTPPage() {
       await verifyOtpAndLogin(phoneNumber, data.otp);
       
       // Force full page reload to ensure middleware runs
-      window.location.href = '/';
+      window.location.href = '/onboarding';
     } catch (err) {
       const apiError = err as { errorCode?: string; errorMessage?: string };
       const errorMessage =

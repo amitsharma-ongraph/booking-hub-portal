@@ -1,22 +1,20 @@
 'use client';
 
 import React from 'react';
-import { Box, Button, Typography, Paper } from '@mui/material';
+import { Box, Paper, Typography } from '@mui/material';
 import Image from 'next/image';
 
-interface SecondOnboardingScreenProps {
-  onNext: () => void;
-  onSkip: () => void;
-}
+interface SecondOnboardingScreenProps {}
 
 interface OptionCardProps {
   label: string;
   iconSrc: string;
   position: {
-    top?: { xs: string; sm: string };
-    bottom?: { xs: string; sm: string };
-    left?: { xs: string; sm: string };
-    right?: { xs: string; sm: string };
+    top?: string | { xs: string; sm: string; md: string };
+    bottom?: string | { xs: string; sm: string; md: string };
+    left?: string | { xs: string; sm: string; md: string };
+    right?: string | { xs: string; sm: string; md: string };
+    transform?: string;
   };
 }
 
@@ -26,16 +24,22 @@ function OptionCard({ label, iconSrc, position }: OptionCardProps) {
       elevation={6}
       sx={{
         position: 'absolute',
-        px: 3,
-        py: 2,
+        px: { xs: 2, sm: 2.5, md: 3 },
+        py: { xs: 1.5, sm: 1.75, md: 2 },
         borderRadius: '21.8px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        minWidth: 190,
+        minWidth: { xs: 150, sm: 170, md: 190 },
+        maxWidth: { xs: 150, sm: 170, md: 190 },
         backgroundColor: '#EDEDED',
         boxShadow: '0px 0px 29px rgba(215, 215, 215, 0.5)',
-        ...position,
+        zIndex: 2,
+        top: position.top,
+        bottom: position.bottom,
+        left: position.left,
+        right: position.right,
+        transform: position.transform,
       }}
     >
       <Typography
@@ -69,182 +73,179 @@ function OptionCard({ label, iconSrc, position }: OptionCardProps) {
   );
 }
 
-export default function SecondOnboardingScreen({
-  onNext,
-  onSkip,
-}: SecondOnboardingScreenProps) {
+export default function SecondOnboardingScreen({}: SecondOnboardingScreenProps) {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
+        width: '100%',
+        height: '100%',
+        maxWidth: 1200,
+        p: { xs: 1, sm: 2, md: 4 },
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#FFFFFF',
-        p: { xs: 2, sm: 3, md: 4 },
       }}
     >
+      {/* Inner box with 10:7 aspect ratio (width:height = 10:7, height = width * 0.7) */}
       <Box
         sx={{
-          width: '100%',
-          maxWidth: 960,
-          p: { xs: 3, sm: 4, md: 6 },
           position: 'relative',
-          overflow: 'hidden',
+          width: '85%',
+          height: 0,
+          paddingBottom: '59.5%', // 10:7 ratio (height = width * 0.7, 85% * 0.7 = 59.5%)
+          maxWidth: '85%',
         }}
       >
-        {/* Large circular background image */}
+        {/* Absolute positioned container for all elements */}
         <Box
           sx={{
-            width: { xs: 260, sm: 320, md: 380 },
-            height: { xs: 260, sm: 320, md: 380 },
-            borderRadius: '50%',
-            overflow: 'hidden',
-            position: 'relative',
-            mx: 'auto',
-            mb: { xs: 4, sm: 5 },
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            '@keyframes fadeInScale': {
+              '0%': {
+                opacity: 0,
+                transform: 'translate(-50%, -50%) scale(0.8)',
+              },
+              '100%': {
+                opacity: 1,
+                transform: 'translate(-50%, -50%) scale(1)',
+              },
+            },
+            '@keyframes slideInFromLeft': {
+              '0%': {
+                opacity: 0,
+                transform: 'translate(-100%, -50%) translateX(-25%) translateX(-40px)',
+              },
+              '100%': {
+                opacity: 1,
+                transform: 'translate(-100%, -50%) translateX(-25%)',
+              },
+            },
+            '@keyframes slideInFromTopRight': {
+              '0%': {
+                opacity: 0,
+                transform: 'translate(15%, -100%) translateY(-15%) translateY(-30px)',
+              },
+              '100%': {
+                opacity: 1,
+                transform: 'translate(15%, -100%) translateY(-15%)',
+              },
+            },
+            '@keyframes slideInFromBottomRight': {
+              '0%': {
+                opacity: 0,
+                transform: 'translate(15%, 100%) translateY(15%) translateY(30px)',
+              },
+              '100%': {
+                opacity: 1,
+                transform: 'translate(15%, 100%) translateY(15%)',
+              },
+            },
           }}
         >
-          <Image
-            src="/images/onboarding/page2-main.png"
-            alt="Service selection"
-            fill
-            sizes="(max-width: 768px) 260px, 380px"
-            style={{ objectFit: 'cover' }}
-            unoptimized
-          />
-        </Box>
-
-        {/* Floating option cards built as rounded rectangles with text + SVG icon */}
-        <OptionCard
-          label="Hair salon"
-          iconSrc="/images/onboarding/page2-hair-salon.svg"
-          position={{
-            top: { xs: '23%', sm: '24%' },
-            right: { xs: '8%', sm: '16%' },
-          }}
-        />
-
-        <OptionCard
-          label="Yoga"
-          iconSrc="/images/onboarding/page2-yoga.svg"
-          position={{
-            top: { xs: '34%', sm: '36%' },
-            left: { xs: '8%', sm: '16%' },
-          }}
-        />
-
-        <OptionCard
-          label="Spa"
-          iconSrc="/images/onboarding/page2-spa.svg"
-          position={{
-            bottom: { xs: '32%', sm: '32%' },
-            right: { xs: '8%', sm: '16%' },
-          }}
-        />
-
-        {/* Content section */}
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            textAlign: 'center',
-            mt: { xs: 4, sm: 5 },
-          }}
-        >
-          {/* Pager dots (second active) */}
+          {/* Large circular background image - centered, maintaining perfect circle */}
           <Box
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 1,
-              mb: { xs: 2, sm: 2.5 },
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: { xs: '60%', sm: '50%', md: '45%' },
+              aspectRatio: '1 / 1', // Ensures perfect circle
+              maxWidth: 380,
+              maxHeight: 380,
+              minWidth: 260,
+              minHeight: 260,
+              borderRadius: '50%',
+              overflow: 'hidden',
+              zIndex: 1,
+              animation: 'fadeInScale 0.8s ease-out 0.2s both',
             }}
           >
+            <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+              <Image
+                src="/images/onboarding/page2-main.png"
+                alt="Service selection"
+                fill
+                style={{ objectFit: 'cover' }}
+                unoptimized
+              />
+            </Box>
+            {/* Black overlay mask with 70% opacity */}
             <Box
               sx={{
-                width: 6,
-                height: 6,
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'rgba(0, 0, 0, 0.7)',
                 borderRadius: '50%',
-                backgroundColor: '#D8D8D8',
-              }}
-            />
-            <Box
-              sx={{
-                width: 6,
-                height: 6,
-                borderRadius: '50%',
-                backgroundColor: '#D8D8D8',
-              }}
-            />
-            <Box
-              sx={{
-                width: 20,
-                height: 6,
-                borderRadius: 999,
-                backgroundColor: '#D2A298',
+                zIndex: 2,
               }}
             />
           </Box>
 
-          <Typography
+          {/* Floating option cards - positioned relative to circle center */}
+          {/* Left side card - starting from left, going into the circle */}
+          <Box
             sx={{
-              fontSize: { xs: '1.4rem', sm: '1.6rem', md: '1.8rem' },
-              fontWeight: 600,
-              color: '#333333',
-              mb: 1.5,
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              zIndex: 3,
+              animation: 'slideInFromLeft 0.8s ease-out 0.6s both',
             }}
           >
-            Discover Your Radiance
-          </Typography>
+            <OptionCard
+              label="Yoga"
+              iconSrc="/images/onboarding/page2-yoga.svg"
+              position={{
+                transform: 'translate(-100%, -50%) translateX(-25%)',
+              }}
+            />
+          </Box>
 
-          <Typography
+          {/* Top right card - inside circle, ending at top right */}
+          <Box
             sx={{
-              fontSize: { xs: '0.85rem', sm: '0.9rem' },
-              color: '#8B8B8B',
-              mb: { xs: 3, sm: 3.5 },
-              maxWidth: 420,
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              zIndex: 3,
+              animation: 'slideInFromTopRight 0.8s ease-out 0.8s both',
             }}
           >
-            Unveil the Glow Within and Shine Brighter Than Ever
-          </Typography>
+            <OptionCard
+              label="Hair salon"
+              iconSrc="/images/onboarding/page2-hair-salon.svg"
+              position={{
+                transform: 'translate(15%, -100%) translateY(-15%)',
+              }}
+            />
+          </Box>
 
-          <Button
-            variant="contained"
-            fullWidth={false}
-            onClick={onNext}
+          {/* Bottom right card - inside circle, ending at bottom right */}
+          <Box
             sx={{
-              minWidth: 260,
-              maxWidth: 320,
-              height: 44,
-              borderRadius: 999,
-              backgroundColor: '#D2A298',
-              color: '#FFFFFF',
-              textTransform: 'none',
-              fontWeight: 600,
-              fontSize: '0.95rem',
-              mb: 1.5,
-              '&:hover': {
-                backgroundColor: '#C8968A',
-              },
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              zIndex: 3,
+              animation: 'slideInFromBottomRight 0.8s ease-out 1s both',
             }}
           >
-            Next
-          </Button>
-
-          <Button
-            variant="text"
-            onClick={onSkip}
-            sx={{
-              color: '#8B8B8B',
-              textTransform: 'none',
-              fontSize: '0.9rem',
-            }}
-          >
-            Skip
-          </Button>
+            <OptionCard
+              label="Spa"
+              iconSrc="/images/onboarding/page2-spa.svg"
+              position={{
+                transform: 'translate(15%, 100%) translateY(15%)',
+              }}
+            />
+          </Box>
         </Box>
       </Box>
     </Box>

@@ -3,9 +3,28 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SplashScreen from '@/components/onboarding/SplashScreen';
+import OnboardingLayout from '@/components/onboarding/OnboardingLayout';
 import FirstOnboardingScreen from '@/components/onboarding/FirstOnboardingScreen';
 import SecondOnboardingScreen from '@/components/onboarding/SecondOnboardingScreen';
 import ThirdOnboardingScreen from '@/components/onboarding/ThirdOnboardingScreen';
+
+const ONBOARDING_STEPS = [
+  {
+    title: 'Refresh, Renew, Rejuvenate',
+    description: 'Experience the Ultimate Revival of Mind, Body, and Soul',
+    design: <FirstOnboardingScreen />,
+  },
+  {
+    title: 'Discover Your Radiance',
+    description: 'Unveil the Glow Within and Shine Brighter Than Ever',
+    design: <SecondOnboardingScreen />,
+  },
+  {
+    title: 'Unlock Your Inner Goddess',
+    description: 'Embrace Your True Power and Beauty with Confidence',
+    design: <ThirdOnboardingScreen />,
+  },
+];
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -21,33 +40,31 @@ export default function OnboardingPage() {
   };
 
   const handleNext = () => {
-    // 0 -> first onboarding screen
-    // 1 -> second onboarding screen
-    // 2 -> third onboarding screen
-    if (currentScreen === 0) {
-      setCurrentScreen(1);
-      return;
+    if (currentScreen < ONBOARDING_STEPS.length - 1) {
+      setCurrentScreen(currentScreen + 1);
+    } else {
+      // After last screen, go to app
+      router.push('/');
     }
-    if (currentScreen === 1) {
-      setCurrentScreen(2);
-      return;
-    }
-    // After third screen, go to app
-    router.push('/');
   };
 
   if (showSplash) {
     return <SplashScreen onComplete={handleSplashComplete} />;
   }
 
-  if (currentScreen === 0) {
-    return <FirstOnboardingScreen onNext={handleNext} onSkip={handleSkip} />;
-  }
+  const currentStep = ONBOARDING_STEPS[currentScreen];
 
-  if (currentScreen === 1) {
-    return <SecondOnboardingScreen onNext={handleNext} onSkip={handleSkip} />;
-  }
-
-  return <ThirdOnboardingScreen onNext={handleNext} onSkip={handleSkip} />;
+  return (
+    <OnboardingLayout
+      currentStep={currentScreen}
+      totalSteps={ONBOARDING_STEPS.length}
+      title={currentStep.title}
+      description={currentStep.description}
+      onNext={handleNext}
+      onSkip={handleSkip}
+    >
+      {currentStep.design}
+    </OnboardingLayout>
+  );
 }
 
