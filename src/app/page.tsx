@@ -61,9 +61,9 @@ export default function DashboardPage() {
           {/* Card 3 */}
           <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <DashboardStatCard
-              title="Revenue"
+              title="Average Rating"
               icon="/images/icons/star.svg"
-              value="$45,678"
+              value="4.5"
             />
           </Grid>
         </Grid>
