@@ -23,6 +23,9 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { format } from 'date-fns';
 import MainLayout from '@/components/layout/MainLayout';
 import CollapsibleCard from '@/components/cards/CollapsibleCard';
+import BookingsTable, { TableColumn, TableRow } from '@/components/tables/BookingsTable';
+import BookedSeatCard, { BookedSeat } from '@/components/cards/BookedSeatCard';
+import { Visibility as VisibilityIcon } from '@mui/icons-material';
 
 export default function BookingsPage() {
   const theme = useTheme();
@@ -33,6 +36,35 @@ export default function BookingsPage() {
   const [serviceFilter, setServiceFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [filtersModalOpen, setFiltersModalOpen] = useState(false);
+  const [bookingDetailsModalOpen, setBookingDetailsModalOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<{
+    session: string;
+    time: string;
+    seats: string;
+    booked: string;
+  } | null>(null);
+  
+  // Mock data for booked seats - in real app, this would come from API
+  const mockBookedSeats: BookedSeat[] = [
+    {
+      seatNumber: 'Seat 1',
+      customerName: 'Katherine Aurelia',
+      email: 'arwakhalifa@gmail.com',
+      phone: '+966 566778159',
+    },
+    {
+      seatNumber: 'Seat 2',
+      customerName: 'John Doe',
+      email: 'john.doe@example.com',
+      phone: '+966 555123456',
+    },
+    {
+      seatNumber: 'Seat 3',
+      customerName: 'Jane Smith',
+      email: 'jane.smith@example.com',
+      phone: '+966 555654321',
+    },
+  ];
 
   const handleCategoryChange = (event: SelectChangeEvent) => {
     setCategoryFilter(event.target.value);
@@ -40,6 +72,16 @@ export default function BookingsPage() {
 
   const handleServiceChange = (event: SelectChangeEvent) => {
     setServiceFilter(event.target.value);
+  };
+
+  const handleViewBooking = (booking: { session: string; time: string; seats: string; booked: string }) => {
+    setSelectedBooking(booking);
+    setBookingDetailsModalOpen(true);
+  };
+
+  const handleCloseBookingModal = () => {
+    setBookingDetailsModalOpen(false);
+    setSelectedBooking(null);
   };
 
   const dateInputRefForModal = useRef<HTMLDivElement>(null);
@@ -513,16 +555,122 @@ export default function BookingsPage() {
                 ]}
                 isPrimary={false}
               >
-                <Typography
-                  sx={{
-                    fontFamily: 'Roboto',
-                    fontSize: '14px',
-                    color: '#808080',
-                    lineHeight: 1.6,
-                  }}
-                >
-                  Details for Topic 1 under Spa.
-                </Typography>
+                <BookingsTable
+                  columns={[
+                    { key: 'session', label: 'Session' },
+                    { key: 'time', label: 'Time' },
+                    { key: 'seats', label: 'Seats' },
+                    { key: 'booked', label: 'Booked' },
+                    { key: 'action', label: 'Action' },
+                  ]}
+                  rows={[
+                    {
+                      session: '1',
+                      time: '08:00–10:00',
+                      seats: '6',
+                      booked: '3/6',
+                      action: (
+                        <Box
+                          onClick={() => handleViewBooking({
+                            session: '1',
+                            time: '08:00–10:00',
+                            seats: '6',
+                            booked: '3/6',
+                          })}
+                          sx={{
+                            width: '25px',
+                            height: '25px',
+                            background: '#FFFFFF',
+                            boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.08)',
+                            borderRadius: '10px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <VisibilityIcon
+                            sx={{
+                              width: '17.81px',
+                              height: '17.81px',
+                              color: theme.palette.secondary.main,
+                            }}
+                          />
+                        </Box>
+                      ),
+                    },
+                    {
+                      session: '2',
+                      time: '08:00–10:00',
+                      seats: '6',
+                      booked: '3/6',
+                      action: (
+                        <Box
+                          onClick={() => handleViewBooking({
+                            session: '2',
+                            time: '08:00–10:00',
+                            seats: '6',
+                            booked: '3/6',
+                          })}
+                          sx={{
+                            width: '25px',
+                            height: '25px',
+                            background: '#FFFFFF',
+                            boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.08)',
+                            borderRadius: '10px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <VisibilityIcon
+                            sx={{
+                              width: '17.81px',
+                              height: '17.81px',
+                              color: theme.palette.secondary.main,
+                            }}
+                          />
+                        </Box>
+                      ),
+                    },
+                    {
+                      session: '3',
+                      time: '08:00–10:00',
+                      seats: '6',
+                      booked: '3/6',
+                      action: (
+                        <Box
+                          onClick={() => handleViewBooking({
+                            session: '3',
+                            time: '08:00–10:00',
+                            seats: '6',
+                            booked: '3/6',
+                          })}
+                          sx={{
+                            width: '25px',
+                            height: '25px',
+                            background: '#FFFFFF',
+                            boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.08)',
+                            borderRadius: '10px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <VisibilityIcon
+                            sx={{
+                              width: '17.81px',
+                              height: '17.81px',
+                              color: theme.palette.secondary.main,
+                            }}
+                          />
+                        </Box>
+                      ),
+                    },
+                  ]}
+                />
               </CollapsibleCard>
 
               <CollapsibleCard
@@ -985,6 +1133,119 @@ export default function BookingsPage() {
                   }}
                 />
               </Box>
+            </Box>
+          </Fade>
+        </Modal>
+
+        {/* Booking Details Modal */}
+        <Modal
+          open={bookingDetailsModalOpen}
+          onClose={handleCloseBookingModal}
+          closeAfterTransition
+          sx={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'flex-end',
+          }}
+        >
+          <Fade in={bookingDetailsModalOpen}>
+            <Box
+              sx={{
+                position: 'relative',
+                width: { xs: '90%', sm: '500px', md: '600px' },
+                maxWidth: { xs: '90vw', sm: '500px', md: '600px' },
+                height: 'calc(100vh - 32px)',
+                maxHeight: 'calc(100vh - 32px)',
+                marginTop: '16px',
+                marginRight: '16px',
+                marginBottom: '16px',
+                marginLeft: 0,
+                backgroundColor: '#FFFFFF',
+                borderRadius: '20px',
+                boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.15)',
+                p: { xs: 3, sm: 4 },
+                overflow: 'hidden',
+                outline: 'none',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              {/* Modal Header */}
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  mb: 3,
+                  flexShrink: 0,
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: { xs: '1.25rem', sm: '1.5rem' },
+                    fontWeight: 700,
+                    color: theme.palette.custom.heading.dashboard,
+                  }}
+                >
+                  Booking Details
+                </Typography>
+                <IconButton
+                  onClick={handleCloseBookingModal}
+                  sx={{
+                    color: '#6A7282',
+                    '&:hover': {
+                      backgroundColor: '#F3F3F5',
+                    },
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </Box>
+
+              {/* Modal Content */}
+              {selectedBooking && (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2,
+                    flex: 1,
+                    overflow: 'hidden',
+                  }}
+                >
+                  {/* Scrollable List of Booked Seats */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 2,
+                      flex: 1,
+                      overflowY: 'auto',
+                      overflowX: 'hidden',
+                      pr: 1,
+                      // Custom scrollbar styling
+                      '&::-webkit-scrollbar': {
+                        width: '6px',
+                      },
+                      '&::-webkit-scrollbar-track': {
+                        background: '#F3F3F5',
+                        borderRadius: '3px',
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        background: '#D0D0D0',
+                        borderRadius: '3px',
+                        '&:hover': {
+                          background: '#B0B0B0',
+                        },
+                      },
+                    }}
+                  >
+                    {mockBookedSeats.map((seat, index) => (
+                      <BookedSeatCard key={index} seat={seat} />
+                    ))}
+                  </Box>
+                </Box>
+              )}
             </Box>
           </Fade>
         </Modal>
