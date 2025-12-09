@@ -88,7 +88,7 @@ export default function AuthPageLayout({ children, cardHeight }: AuthPageLayoutP
             height: '100%',
           }}
           priority
-          unoptimized
+          sizes="(max-width: 600px) 80px, (max-width: 960px) 90px, 100px"
         />
       </Box>
 

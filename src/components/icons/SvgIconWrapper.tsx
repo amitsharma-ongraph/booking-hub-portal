@@ -47,17 +47,15 @@ export default function SvgIconWrapper({
     : undefined;
 
   if (isStringPath) {
-    // For string paths, use an img tag with CSS filter for color approximation
+    // For string paths, use Next.js Image with CSS filter for color approximation
     // Note: CSS filters are approximations. For exact colors, use SVG components.
     return (
       <Box
-        component="img"
-        src={src}
-        alt="Icon"
         sx={{
           width: size,
           height: size,
-          objectFit: 'contain',
+          position: 'relative',
+          flexShrink: 0,
           // Apply color filter if color is specified
           ...(color && typeof color === 'string' && color !== 'inherit' 
             ? { 
@@ -66,7 +64,16 @@ export default function SvgIconWrapper({
             : {}),
           ...sx,
         }}
-      />
+      >
+        <Image
+          src={src}
+          alt="Icon"
+          fill
+          sizes={`${size}px`}
+          style={{ objectFit: 'contain' }}
+          loading="lazy"
+        />
+      </Box>
     );
   }
 

@@ -14,6 +14,7 @@ import { ArrowBack } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Image from 'next/image';
 import AuthPageLayout from '@/components/auth/AuthPageLayout';
 import FormButton from '@/components/forms/FormButton';
 import OtpInput from '@/components/forms/OtpInput';
@@ -194,15 +195,20 @@ export default function OTPPage() {
           }}
         >
           <Box
-            component="img"
-            src="/images/otp/otp-badge.svg"
-            alt="OTP badge"
             sx={{
               width: { xs: 70, sm: 80, md: 90 },
               height: { xs: 70, sm: 80, md: 90 },
-              display: 'block',
+              position: 'relative',
             }}
-          />
+          >
+            <Image
+              src="/images/otp/otp-badge.svg"
+              alt="OTP badge"
+              fill
+              sizes="(max-width: 600px) 70px, (max-width: 960px) 80px, 90px"
+              style={{ objectFit: 'contain' }}
+            />
+          </Box>
         </Box>
 
         {/* Description Text */}

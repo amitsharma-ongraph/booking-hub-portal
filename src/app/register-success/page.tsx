@@ -63,7 +63,7 @@ export default function RegisterSuccessPage() {
               height: '100%',
             }}
             priority
-            unoptimized
+            sizes="192px"
           />
         </Box>
 

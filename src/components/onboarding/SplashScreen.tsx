@@ -124,7 +124,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
               maxHeight: '100%',
             }}
             priority
-            unoptimized
+            sizes="(max-width: 600px) 280px, (max-width: 960px) 350px, (max-width: 1280px) 420px, 500px"
           />
         </Box>
       </Box>

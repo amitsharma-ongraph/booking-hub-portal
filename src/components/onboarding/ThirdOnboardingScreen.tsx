@@ -51,7 +51,7 @@ function LocationCard({ imageSrc, alt, position, size, animation }: LocationCard
           fill
           sizes="(max-width: 600px) 20px, (max-width: 960px) 28px, 32px"
           style={{ objectFit: 'contain' }}
-          unoptimized
+          loading="lazy"
         />
       </Box>
 
@@ -74,7 +74,7 @@ function LocationCard({ imageSrc, alt, position, size, animation }: LocationCard
           fill
           sizes="(max-width: 600px) 125px, (max-width: 960px) 175px, 200px"
           style={{ objectFit: 'cover' }}
-          unoptimized
+          loading="lazy"
         />
       </Paper>
     </Box>
@@ -163,7 +163,7 @@ export default function ThirdOnboardingScreen({}: ThirdOnboardingScreenProps) {
             fill
             sizes="(max-width: 600px) 100vw, (max-width: 960px) 80vw, 950px"
             style={{ objectFit: 'cover' }}
-            unoptimized
+            priority
           />
         </Box>
 

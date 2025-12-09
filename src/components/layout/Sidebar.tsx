@@ -11,6 +11,7 @@ import {
 import Image from 'next/image';
 import { Logout as LogoutIcon } from '@mui/icons-material';
 import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import SidebarMenuItem, { SidebarMenuItemProps } from './SidebarMenuItem';
 
 const drawerWidth = 285; // Match SVG width
@@ -62,10 +63,10 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
   const handleNavigation = (path: string) => {
     // For protected routes, ensure middleware runs by checking if we need full reload
     // Middleware will handle protection, but we use normal navigation for better UX
-    router.push(path);
     if (isMobile) {
       onClose();
     }
+    router.push(path);
   };
 
   const drawer = (
@@ -104,7 +105,7 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
               height: '100%',
             }}
             priority
-            unoptimized
+            sizes="40px"
           />
         </Box>
       </Box>

@@ -118,8 +118,9 @@ export default function FirstOnboardingScreen({}: FirstOnboardingScreenProps) {
                     src="/images/onboarding/page1-left.png"
                     alt="Relaxation magazine"
                     fill
+                    sizes="(max-width: 1200px) 30vw, 360px"
                     style={{ objectFit: 'contain' }}
-                    unoptimized
+                    loading="lazy"
                   />
                 </Box>
               </Box>
@@ -141,8 +142,9 @@ export default function FirstOnboardingScreen({}: FirstOnboardingScreenProps) {
                     src="/images/onboarding/page1-right.png"
                     alt="Sauna room"
                     fill
+                    sizes="(max-width: 1200px) 29vw, 348px"
                     style={{ objectFit: 'contain' }}
-                    unoptimized
+                    loading="lazy"
                   />
                 </Box>
               </Box>
@@ -165,8 +167,9 @@ export default function FirstOnboardingScreen({}: FirstOnboardingScreenProps) {
                     src="/images/onboarding/page1-center.png"
                     alt="Spa treatment"
                     fill
+                    sizes="(max-width: 1200px) 28vw, 336px"
                     style={{ objectFit: 'contain' }}
-                    unoptimized
+                    loading="lazy"
                   />
                 </Box>
               </Box>
@@ -198,8 +201,9 @@ export default function FirstOnboardingScreen({}: FirstOnboardingScreenProps) {
                     src="/images/onboarding/leaves-decoration.svg"
                     alt=""
                     fill
+                    sizes="(max-width: 1200px) 15vw, 180px"
                     style={{ objectFit: 'contain' }}
-                    unoptimized
+                    loading="lazy"
                   />
                 </Box>
               </Box>
@@ -228,8 +232,9 @@ export default function FirstOnboardingScreen({}: FirstOnboardingScreenProps) {
                     src="/images/onboarding/leaves-decoration.svg"
                     alt=""
                     fill
+                    sizes="(max-width: 1200px) 15vw, 180px"
                     style={{ objectFit: 'contain' }}
-                    unoptimized
+                    loading="lazy"
                   />
                 </Box>
               </Box>
@@ -251,8 +256,9 @@ export default function FirstOnboardingScreen({}: FirstOnboardingScreenProps) {
                     src="/images/onboarding/leaves-decoration.svg"
                     alt=""
                     fill
+                    sizes="(max-width: 1200px) 15vw, 180px"
                     style={{ objectFit: 'contain' }}
-                    unoptimized
+                    loading="lazy"
                   />
                 </Box>
               </Box>

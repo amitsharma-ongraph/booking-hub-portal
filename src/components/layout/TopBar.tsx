@@ -186,7 +186,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
             onClick={handleMenu}
           >
             {profilePicture.startsWith('http://') || profilePicture.startsWith('https://') ? (
-              // External URL (S3) - use regular img tag
+              // External URL (S3) - use regular img tag (Next.js Image doesn't support external URLs without config)
               <Box
                 component="img"
                 src={profilePicture}
@@ -197,19 +197,17 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
                   height: '100%',
                   objectFit: 'cover',
                 }}
+                loading="lazy"
               />
             ) : (
               // Local path - use Next.js Image
-              <Box
-                component="img"
+              <Image
                 src={profilePicture}
                 alt={userName || 'User Avatar'}
+                fill
+                sizes="45px"
+                style={{ objectFit: 'cover' }}
                 onError={() => setImageError(true)}
-                sx={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                }}
               />
             )}
           </Box>

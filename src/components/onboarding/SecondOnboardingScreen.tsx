@@ -66,7 +66,7 @@ function OptionCard({ label, iconSrc, position }: OptionCardProps) {
           fill
           sizes="32px"
           style={{ objectFit: 'contain' }}
-          unoptimized
+          loading="lazy"
         />
       </Box>
     </Paper>
@@ -170,8 +170,9 @@ export default function SecondOnboardingScreen({}: SecondOnboardingScreenProps) 
                 src="/images/onboarding/page2-main.png"
                 alt="Service selection"
                 fill
+                sizes="(max-width: 600px) 60vw, (max-width: 960px) 50vw, 380px"
                 style={{ objectFit: 'cover' }}
-                unoptimized
+                priority
               />
             </Box>
             {/* Black overlay mask with 70% opacity */}
