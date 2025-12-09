@@ -22,6 +22,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { format } from 'date-fns';
 import MainLayout from '@/components/layout/MainLayout';
+import CollapsibleCard from '@/components/cards/CollapsibleCard';
 
 export default function BookingsPage() {
   const theme = useTheme();
@@ -473,6 +474,206 @@ export default function BookingsPage() {
               </Box>
           </CardContent>
         </Card>
+
+        {/* Collapsible Cards Section */}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            width: '100%',
+            mb: { xs: 3, sm: 4 },
+          }}
+        >
+          <CollapsibleCard
+            title="Spa"
+            labelValuePairs={[
+              "Total ر.س 512 💰",
+              "12 sessions",
+              "20/36 seats filled"
+            ]}
+            isPrimary={true}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+                width: '100%',
+                maxWidth: '100%',
+                boxSizing: 'border-box',
+              }}
+            >
+              <CollapsibleCard
+                title="Topic 1"
+                labelValuePairs={[
+                  "Total ر.س 256 💰",
+                  "6 sessions",
+                  "10/18 seats filled"
+                ]}
+                isPrimary={false}
+              >
+                <Typography
+                  sx={{
+                    fontFamily: 'Roboto',
+                    fontSize: '14px',
+                    color: '#808080',
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Details for Topic 1 under Spa.
+                </Typography>
+              </CollapsibleCard>
+
+              <CollapsibleCard
+                title="Topic 2"
+                labelValuePairs={[
+                  "Total ر.س 256 💰",
+                  "6 sessions",
+                  "10/18 seats filled"
+                ]}
+                isPrimary={false}
+              >
+                <Typography
+                  sx={{
+                    fontFamily: 'Roboto',
+                    fontSize: '14px',
+                    color: '#808080',
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Details for Topic 2 under Spa.
+                </Typography>
+              </CollapsibleCard>
+            </Box>
+          </CollapsibleCard>
+
+          <CollapsibleCard
+            title="Haircut"
+            labelValuePairs={[
+              "Total ر.س 250 💰",
+              "8 sessions",
+              "15/20 seats filled"
+            ]}
+            isPrimary={true}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+                width: '100%',
+                maxWidth: '100%',
+                boxSizing: 'border-box',
+              }}
+            >
+              <CollapsibleCard
+                title="Topic 1"
+                labelValuePairs={[
+                  "Total ر.س 125 💰",
+                  "4 sessions",
+                  "8/10 seats filled"
+                ]}
+                isPrimary={false}
+              >
+                <Typography
+                  sx={{
+                    fontFamily: 'Roboto',
+                    fontSize: '14px',
+                    color: '#808080',
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Details for Topic 1 under Haircut.
+                </Typography>
+              </CollapsibleCard>
+
+              <CollapsibleCard
+                title="Topic 2"
+                labelValuePairs={[
+                  "Total ر.س 125 💰",
+                  "4 sessions",
+                  "7/10 seats filled"
+                ]}
+                isPrimary={false}
+              >
+                <Typography
+                  sx={{
+                    fontFamily: 'Roboto',
+                    fontSize: '14px',
+                    color: '#808080',
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Details for Topic 2 under Haircut.
+                </Typography>
+              </CollapsibleCard>
+            </Box>
+          </CollapsibleCard>
+
+          <CollapsibleCard
+            title="Massage"
+            labelValuePairs={[
+              "Total ر.س 380 💰",
+              "6 sessions",
+              "10/15 seats filled"
+            ]}
+            isPrimary={true}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+                width: '100%',
+                maxWidth: '100%',
+                boxSizing: 'border-box',
+              }}
+            >
+              <CollapsibleCard
+                title="Topic 1"
+                labelValuePairs={[
+                  "Total ر.س 190 💰",
+                  "3 sessions",
+                  "5/8 seats filled"
+                ]}
+                isPrimary={false}
+              >
+                <Typography
+                  sx={{
+                    fontFamily: 'Roboto',
+                    fontSize: '14px',
+                    color: '#808080',
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Details for Topic 1 under Massage.
+                </Typography>
+              </CollapsibleCard>
+
+              <CollapsibleCard
+                title="Topic 2"
+                labelValuePairs={[
+                  "Total ر.س 190 💰",
+                  "3 sessions",
+                  "5/7 seats filled"
+                ]}
+                isPrimary={false}
+              >
+                <Typography
+                  sx={{
+                    fontFamily: 'Roboto',
+                    fontSize: '14px',
+                    color: '#808080',
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Details for Topic 2 under Massage.
+                </Typography>
+              </CollapsibleCard>
+            </Box>
+          </CollapsibleCard>
+        </Box>
 
         {/* Filters Modal - Mobile Only */}
         <Modal
