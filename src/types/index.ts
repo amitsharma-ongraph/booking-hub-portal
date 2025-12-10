@@ -44,6 +44,7 @@ export interface Rating {
   rating: number;
   comment: string;
   date: string;
+  time: string;
   service: string;
 }
 

@@ -7,8 +7,6 @@ import {
   IconButton,
   Typography,
   Box,
-  Menu,
-  MenuItem,
   Badge,
   useTheme,
   useMediaQuery,
@@ -16,9 +14,9 @@ import {
 import {
   Menu as MenuIcon,
   NotificationsOutlined as NotificationsIcon,
-  AccountCircle,
 } from '@mui/icons-material';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/contexts/AuthContext';
 
 interface TopBarProps {
@@ -29,7 +27,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { user } = useAuthContext();
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const router = useRouter();
   const [mounted, setMounted] = React.useState(false);
   const [imageError, setImageError] = React.useState(false);
 
@@ -38,12 +36,8 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
     setMounted(true);
   }, []);
 
-  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
+  const handleAvatarClick = () => {
+    router.push('/profile');
   };
 
   // Get user name from auth context (only after mount to avoid hydration issues)
@@ -182,8 +176,12 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
               borderRadius: '50%',
               overflow: 'hidden',
               flexShrink: 0,
+              transition: 'opacity 0.2s',
+              '&:hover': {
+                opacity: 0.8,
+              },
             }}
-            onClick={handleMenu}
+            onClick={handleAvatarClick}
           >
             {profilePicture.startsWith('http://') || profilePicture.startsWith('https://') ? (
               // External URL (S3) - use regular img tag (Next.js Image doesn't support external URLs without config)
@@ -212,28 +210,6 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
             )}
           </Box>
         </Box>
-
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          sx={{ mt: 1 }}
-        >
-          <MenuItem onClick={handleClose}>
-            <AccountCircle sx={{ mr: 1.5 }} />
-            Profile
-          </MenuItem>
-          <MenuItem onClick={handleClose}>Settings</MenuItem>
-          <MenuItem onClick={handleClose}>Logout</MenuItem>
-        </Menu>
       </Toolbar>
     </AppBar>
   );

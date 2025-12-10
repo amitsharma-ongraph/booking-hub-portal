@@ -158,6 +158,7 @@ export const mockRatings: Rating[] = [
     rating: 5,
     comment: 'Excellent service! Very professional and friendly staff.',
     date: '2024-12-01',
+    time: '10:30 AM',
     service: 'Hair Styling',
   },
   {
@@ -166,6 +167,7 @@ export const mockRatings: Rating[] = [
     rating: 4,
     comment: 'Great experience overall. Would recommend!',
     date: '2024-12-02',
+    time: '2:15 PM',
     service: 'Massage Therapy',
   },
   {
@@ -174,6 +176,7 @@ export const mockRatings: Rating[] = [
     rating: 5,
     comment: 'Amazing results! Best facial I\'ve ever had.',
     date: '2024-12-02',
+    time: '11:45 AM',
     service: 'Facial Treatment',
   },
   {
@@ -182,6 +185,7 @@ export const mockRatings: Rating[] = [
     rating: 4,
     comment: 'Good service, clean facility, friendly staff.',
     date: '2024-12-03',
+    time: '9:00 AM',
     service: 'Personal Training',
   },
   {
@@ -190,6 +194,7 @@ export const mockRatings: Rating[] = [
     rating: 5,
     comment: 'Absolutely loved it! Will definitely come back.',
     date: '2024-12-03',
+    time: '3:30 PM',
     service: 'Manicure & Pedicure',
   },
 ];
