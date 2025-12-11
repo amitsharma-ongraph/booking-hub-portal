@@ -27,70 +27,161 @@ import BookingsTable, { TableColumn, TableRow } from '@/components/tables/Bookin
 import BookedSeatCard, { BookedSeat } from '@/components/cards/BookedSeatCard';
 import { Visibility as VisibilityIcon } from '@mui/icons-material';
 import { useCompanyContext } from '@/contexts/CompanyContext';
+import { useCompanies } from '@/hooks/companies/useCompanies';
+import LoadingSpinner from '@/components/loaders/LoadingSpinner';
 
 export default function BookingsPage() {
   const theme = useTheme();
   const { company, isLoading } = useCompanyContext();
+  const { getBookingsData } = useCompanies();
 
-  // Log company data from context when it changes
-  useEffect(() => {
-    if (company) {
-      console.log('🏢 Company data in CompanyContext (bookings page):', company);
-    }
-  }, [company]);
   const [dateFilter, setDateFilter] = useState<Date | null>(null);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const dateInputRef = useRef<HTMLDivElement>(null);
+
+  // Set initial date filter from bookings data when company loads (only if dateFilter is null)
+  useEffect(() => {
+    if (company && !dateFilter) {
+      // Get bookings data without date filter to get the most recent date
+      const bookingsData = getBookingsData(company, null);
+      
+      // Set the date filter from bookings data if date exists
+      // Use the date string directly to avoid timezone conversion issues
+      if (bookingsData.date) {
+        // Parse the date string (YYYY-MM-DD) directly without timezone conversion
+        const [year, month, day] = bookingsData.date.split('-').map(Number);
+        const dateFromBookings = new Date(year, month - 1, day); // month is 0-indexed
+        setDateFilter(dateFromBookings);
+        console.log('📅 Set initial date filter from bookings data:', bookingsData.date);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [company]); // Only depend on company, not dateFilter to avoid loop
+
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const [serviceFilter, setServiceFilter] = useState('all');
+  const [optionFilter, setOptionFilter] = useState('all');
+  const [bookingsData, setBookingsData] = useState<ReturnType<typeof getBookingsData> | null>(null);
+
+  // Transform bookings data when company, date, category, or option filter changes
+  useEffect(() => {
+    if (company) {
+      console.log('🏢 Company data in CompanyContext (bookings page):', company);
+      
+      // Convert date filter to date string format if provided
+      // Use local time formatting to avoid timezone conversion issues
+      let filterDateString: string | null = null;
+      if (dateFilter) {
+        // Format date as YYYY-MM-DD using local time (not UTC)
+        const year = dateFilter.getFullYear();
+        const month = String(dateFilter.getMonth() + 1).padStart(2, '0'); // month is 0-indexed
+        const day = String(dateFilter.getDate()).padStart(2, '0');
+        filterDateString = `${year}-${month}-${day}`;
+      }
+      
+      // Transform and log bookings data with all filters
+      const data = getBookingsData(
+        company,
+        filterDateString,
+        categoryFilter === 'all' ? null : categoryFilter,
+        optionFilter === 'all' ? null : optionFilter
+      );
+      console.log('📋 Bookings data:', data);
+      setBookingsData(data);
+    }
+  }, [company, dateFilter, categoryFilter, optionFilter, getBookingsData]);
+
+  // Reset option filter when category filter changes
+  useEffect(() => {
+    if (categoryFilter === 'all') {
+      setOptionFilter('all');
+    }
+  }, [categoryFilter]);
+
+  // Get filtered options based on selected category
+  const getFilteredOptions = () => {
+    if (!bookingsData || categoryFilter === 'all') {
+      return [];
+    }
+    return bookingsData.availableOptions.filter((option) => option.categoryId === categoryFilter);
+  };
   const [searchQuery, setSearchQuery] = useState('');
   const [filtersModalOpen, setFiltersModalOpen] = useState(false);
   const [bookingDetailsModalOpen, setBookingDetailsModalOpen] = useState(false);
-  const [selectedBooking, setSelectedBooking] = useState<{
-    session: string;
-    time: string;
-    seats: string;
-    booked: string;
+  const [selectedSession, setSelectedSession] = useState<{
+    sessionId: string;
+    startTime: string;
+    endTime: string;
+    totalSeats: number;
+    availableSeats: number;
+    bookings: Array<{
+      id: string;
+      customerName: string;
+      email?: string;
+      phone?: string;
+      numberOfSeats: number;
+      price: number;
+      status: string;
+    }>;
   } | null>(null);
-  
-  // Mock data for booked seats - in real app, this would come from API
-  const mockBookedSeats: BookedSeat[] = [
-    {
-      seatNumber: 'Seat 1',
-      customerName: 'Katherine Aurelia',
-      email: 'arwakhalifa@gmail.com',
-      phone: '+966 566778159',
-    },
-    {
-      seatNumber: 'Seat 2',
-      customerName: 'John Doe',
-      email: 'john.doe@example.com',
-      phone: '+966 555123456',
-    },
-    {
-      seatNumber: 'Seat 3',
-      customerName: 'Jane Smith',
-      email: 'jane.smith@example.com',
-      phone: '+966 555654321',
-    },
-  ];
+
+  // Helper function to format time from ISO string
+  const formatTime = (isoString: string): string => {
+    try {
+      const date = new Date(isoString);
+      return format(date, 'HH:mm');
+    } catch {
+      return isoString;
+    }
+  };
+
+  // Helper function to format date
+  const formatDate = (dateString: string): string => {
+    try {
+      const date = new Date(dateString + 'T00:00:00');
+      return format(date, 'dd/MM/yyyy');
+    } catch {
+      return dateString;
+    }
+  };
+
+  // Helper function to format currency
+  const formatCurrency = (amount: number): string => {
+    return `ر.س ${amount.toLocaleString()}`;
+  };
 
   const handleCategoryChange = (event: SelectChangeEvent) => {
     setCategoryFilter(event.target.value);
+    // Reset option filter when category changes
+    setOptionFilter('all');
   };
 
-  const handleServiceChange = (event: SelectChangeEvent) => {
-    setServiceFilter(event.target.value);
+  const handleOptionChange = (event: SelectChangeEvent) => {
+    setOptionFilter(event.target.value);
   };
 
-  const handleViewBooking = (booking: { session: string; time: string; seats: string; booked: string }) => {
-    setSelectedBooking(booking);
+  const handleViewBooking = (sessionData: {
+    sessionId: string;
+    startTime: string;
+    endTime: string;
+    totalSeats: number;
+    availableSeats: number;
+    bookings: Array<{
+      id: string;
+      customerName: string;
+      email?: string;
+      phone?: string;
+      numberOfSeats: number;
+      price: number;
+      status: string;
+    }>;
+  }) => {
+    setSelectedSession(sessionData);
     setBookingDetailsModalOpen(true);
   };
 
   const handleCloseBookingModal = () => {
     setBookingDetailsModalOpen(false);
-    setSelectedBooking(null);
+    setSelectedSession(null);
   };
 
   const dateInputRefForModal = useRef<HTMLDivElement>(null);
@@ -421,14 +512,15 @@ export default function BookingsPage() {
                   }}
                 >
                   <MenuItem value="all">All Categories</MenuItem>
-                  <MenuItem value="haircut">Haircut</MenuItem>
-                  <MenuItem value="spa">Spa</MenuItem>
-                  <MenuItem value="massage">Massage</MenuItem>
-                  <MenuItem value="facial">Facial</MenuItem>
+                  {bookingsData?.availableCategories.map((category) => (
+                    <MenuItem key={category.id} value={category.id}>
+                      {category.name}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
 
-              {/* All services Filter */}
+              {/* Options Filter */}
               <FormControl
                 sx={{
                   width: { xs: '100%', sm: 'calc(50% - 6px)', md: '255.31px' },
@@ -437,8 +529,9 @@ export default function BookingsPage() {
                 }}
               >
                 <Select
-                  value={serviceFilter}
-                  onChange={handleServiceChange}
+                  value={optionFilter}
+                  onChange={handleOptionChange}
+                  disabled={categoryFilter === 'all'}
                   IconComponent={KeyboardArrowDownIcon}
                   sx={{
                     height: '40px',
@@ -477,11 +570,12 @@ export default function BookingsPage() {
                     },
                   }}
                 >
-                  <MenuItem value="all">All services</MenuItem>
-                  <MenuItem value="haircut">Haircut</MenuItem>
-                  <MenuItem value="spa">Spa</MenuItem>
-                  <MenuItem value="massage">Massage</MenuItem>
-                  <MenuItem value="facial">Facial</MenuItem>
+                  <MenuItem value="all">All Options</MenuItem>
+                  {getFilteredOptions().map((option) => (
+                    <MenuItem key={option.id} value={option.id}>
+                      {option.name}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
 
@@ -536,15 +630,49 @@ export default function BookingsPage() {
             mb: { xs: 3, sm: 4 },
           }}
         >
-          <CollapsibleCard
-            title="Spa"
-            labelValuePairs={[
-              "Total ر.س 512 💰",
-              "12 sessions",
-              "20/36 seats filled"
-            ]}
-            isPrimary={true}
-          >
+          {isLoading ? (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                py: 8,
+                width: '100%',
+              }}
+            >
+              <LoadingSpinner text="Loading" />
+            </Box>
+          ) : !bookingsData || bookingsData.categories.length === 0 ? (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                py: 8,
+              }}
+            >
+              <Typography
+                sx={{
+                  fontFamily: 'Roboto',
+                  fontSize: '16px',
+                  color: '#808080',
+                }}
+              >
+                No bookings available for the selected filters.
+              </Typography>
+            </Box>
+          ) : (
+            bookingsData.categories.map((category) => (
+            <CollapsibleCard
+              key={category.categoryId}
+              title={category.name}
+              labelValuePairs={[
+                `Total ${formatCurrency(category.totalPrice)} 💰`,
+                `${category.totalSessions} sessions`,
+                `${category.bookedSeats}/${category.totalSeats} seats filled`
+              ]}
+              isPrimary={true}
+            >
             <Box
               sx={{
                 display: 'flex',
@@ -555,281 +683,95 @@ export default function BookingsPage() {
                 boxSizing: 'border-box',
               }}
             >
-              <CollapsibleCard
-                title="Topic 1"
-                labelValuePairs={[
-                  "Total ر.س 256 💰",
-                  "6 sessions",
-                  "10/18 seats filled"
-                ]}
-                isPrimary={false}
-              >
-                <BookingsTable
-                  columns={[
-                    { key: 'session', label: 'Session' },
-                    { key: 'time', label: 'Time' },
-                    { key: 'seats', label: 'Seats' },
-                    { key: 'booked', label: 'Booked' },
-                    { key: 'action', label: 'Action' },
+              {category.options.map((option) => (
+                <CollapsibleCard
+                  key={option.id}
+                  title={option.name}
+                  labelValuePairs={[
+                    `Total ${formatCurrency(option.totalPrice)} 💰`,
+                    `${option.totalSessions} sessions`,
+                    `${option.bookedSeats}/${option.totalSeats} seats filled`
                   ]}
-                  rows={[
-                    {
-                      session: '1',
-                      time: '08:00–10:00',
-                      seats: '6',
-                      booked: '3/6',
-                      action: (
-                        <Box
-                          onClick={() => handleViewBooking({
-                            session: '1',
-                            time: '08:00–10:00',
-                            seats: '6',
-                            booked: '3/6',
-                          })}
-                          sx={{
-                            width: '25px',
-                            height: '25px',
-                            background: '#FFFFFF',
-                            boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.08)',
-                            borderRadius: '10px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          <VisibilityIcon
-                            sx={{
-                              width: '17.81px',
-                              height: '17.81px',
-                              color: theme.palette.secondary.main,
-                            }}
-                          />
-                        </Box>
-                      ),
-                    },
-                    {
-                      session: '2',
-                      time: '08:00–10:00',
-                      seats: '6',
-                      booked: '3/6',
-                      action: (
-                        <Box
-                          onClick={() => handleViewBooking({
-                            session: '2',
-                            time: '08:00–10:00',
-                            seats: '6',
-                            booked: '3/6',
-                          })}
-                          sx={{
-                            width: '25px',
-                            height: '25px',
-                            background: '#FFFFFF',
-                            boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.08)',
-                            borderRadius: '10px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          <VisibilityIcon
-                            sx={{
-                              width: '17.81px',
-                              height: '17.81px',
-                              color: theme.palette.secondary.main,
-                            }}
-                          />
-                        </Box>
-                      ),
-                    },
-                    {
-                      session: '3',
-                      time: '08:00–10:00',
-                      seats: '6',
-                      booked: '3/6',
-                      action: (
-                        <Box
-                          onClick={() => handleViewBooking({
-                            session: '3',
-                            time: '08:00–10:00',
-                            seats: '6',
-                            booked: '3/6',
-                          })}
-                          sx={{
-                            width: '25px',
-                            height: '25px',
-                            background: '#FFFFFF',
-                            boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.08)',
-                            borderRadius: '10px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          <VisibilityIcon
-                            sx={{
-                              width: '17.81px',
-                              height: '17.81px',
-                              color: theme.palette.secondary.main,
-                            }}
-                          />
-                        </Box>
-                      ),
-                    },
-                  ]}
-                />
-              </CollapsibleCard>
-
-              <CollapsibleCard
-                title="Topic 2"
-                labelValuePairs={[
-                  "Total ر.س 256 💰",
-                  "6 sessions",
-                  "10/18 seats filled"
-                ]}
-                isPrimary={false}
-              >
-                <Typography
-                  sx={{
-                    fontFamily: 'Roboto',
-                    fontSize: '14px',
-                    color: '#808080',
-                    lineHeight: 1.6,
-                  }}
+                  isPrimary={false}
                 >
-                  Details for Topic 2 under Spa.
-                </Typography>
-              </CollapsibleCard>
+                  {option.sessions.length > 0 ? (
+                    <BookingsTable
+                      columns={[
+                        { key: 'session', label: 'Session' },
+                        { key: 'time', label: 'Time' },
+                        { key: 'seats', label: 'Seats' },
+                        { key: 'booked', label: 'Booked' },
+                        { key: 'action', label: 'Action' },
+                      ]}
+                      rows={option.sessions.map((session, index) => {
+                        const bookedSeats = session.totalNumberOfSeats - session.availableNumberOfSeats;
+                        const timeRange = `${formatTime(session.startTime)}–${formatTime(session.endTime)}`;
+                        
+                        return {
+                          session: String(index + 1),
+                          time: timeRange,
+                          seats: String(session.totalNumberOfSeats),
+                          booked: `${bookedSeats}/${session.totalNumberOfSeats}`,
+                          action: (
+                            <Box
+                              onClick={() => handleViewBooking({
+                                sessionId: session.id,
+                                startTime: session.startTime,
+                                endTime: session.endTime,
+                                totalSeats: session.totalNumberOfSeats,
+                                availableSeats: session.availableNumberOfSeats,
+                                bookings: session.bookings.map((booking) => ({
+                                  id: booking.id,
+                                  customerName: booking.customerName || 'N/A',
+                                  email: 'N/A', // Email not available in booking data from API
+                                  phone: 'N/A', // Phone not available in booking data from API
+                                  numberOfSeats: booking.numberOfSeats || 1,
+                                  price: booking.price || 0,
+                                  status: booking.status || 'unknown',
+                                })),
+                              })}
+                              sx={{
+                                width: '25px',
+                                height: '25px',
+                                background: '#FFFFFF',
+                                boxShadow: '0px 0px 15px rgba(0, 0, 0, 0.08)',
+                                borderRadius: '10px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              <VisibilityIcon
+                                sx={{
+                                  width: '17.81px',
+                                  height: '17.81px',
+                                  color: theme.palette.secondary.main,
+                                }}
+                              />
+                            </Box>
+                          ),
+                        };
+                      })}
+                    />
+                  ) : (
+                    <Typography
+                      sx={{
+                        fontFamily: 'Roboto',
+                        fontSize: '14px',
+                        color: '#808080',
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      No sessions available for this option on the selected date.
+                    </Typography>
+                  )}
+                </CollapsibleCard>
+              ))}
             </Box>
           </CollapsibleCard>
-
-          <CollapsibleCard
-            title="Haircut"
-            labelValuePairs={[
-              "Total ر.س 250 💰",
-              "8 sessions",
-              "15/20 seats filled"
-            ]}
-            isPrimary={true}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2,
-                width: '100%',
-                maxWidth: '100%',
-                boxSizing: 'border-box',
-              }}
-            >
-              <CollapsibleCard
-                title="Topic 1"
-                labelValuePairs={[
-                  "Total ر.س 125 💰",
-                  "4 sessions",
-                  "8/10 seats filled"
-                ]}
-                isPrimary={false}
-              >
-                <Typography
-                  sx={{
-                    fontFamily: 'Roboto',
-                    fontSize: '14px',
-                    color: '#808080',
-                    lineHeight: 1.6,
-                  }}
-                >
-                  Details for Topic 1 under Haircut.
-                </Typography>
-              </CollapsibleCard>
-
-              <CollapsibleCard
-                title="Topic 2"
-                labelValuePairs={[
-                  "Total ر.س 125 💰",
-                  "4 sessions",
-                  "7/10 seats filled"
-                ]}
-                isPrimary={false}
-              >
-                <Typography
-                  sx={{
-                    fontFamily: 'Roboto',
-                    fontSize: '14px',
-                    color: '#808080',
-                    lineHeight: 1.6,
-                  }}
-                >
-                  Details for Topic 2 under Haircut.
-                </Typography>
-              </CollapsibleCard>
-            </Box>
-          </CollapsibleCard>
-
-          <CollapsibleCard
-            title="Massage"
-            labelValuePairs={[
-              "Total ر.س 380 💰",
-              "6 sessions",
-              "10/15 seats filled"
-            ]}
-            isPrimary={true}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2,
-                width: '100%',
-                maxWidth: '100%',
-                boxSizing: 'border-box',
-              }}
-            >
-              <CollapsibleCard
-                title="Topic 1"
-                labelValuePairs={[
-                  "Total ر.س 190 💰",
-                  "3 sessions",
-                  "5/8 seats filled"
-                ]}
-                isPrimary={false}
-              >
-                <Typography
-                  sx={{
-                    fontFamily: 'Roboto',
-                    fontSize: '14px',
-                    color: '#808080',
-                    lineHeight: 1.6,
-                  }}
-                >
-                  Details for Topic 1 under Massage.
-                </Typography>
-              </CollapsibleCard>
-
-              <CollapsibleCard
-                title="Topic 2"
-                labelValuePairs={[
-                  "Total ر.س 190 💰",
-                  "3 sessions",
-                  "5/7 seats filled"
-                ]}
-                isPrimary={false}
-              >
-                <Typography
-                  sx={{
-                    fontFamily: 'Roboto',
-                    fontSize: '14px',
-                    color: '#808080',
-                    lineHeight: 1.6,
-                  }}
-                >
-                  Details for Topic 2 under Massage.
-                </Typography>
-              </CollapsibleCard>
-            </Box>
-          </CollapsibleCard>
+            ))
+          )}
         </Box>
 
         {/* Filters Modal - Mobile Only */}
@@ -1048,18 +990,20 @@ export default function BookingsPage() {
                     }}
                   >
                     <MenuItem value="all">All Categories</MenuItem>
-                    <MenuItem value="haircut">Haircut</MenuItem>
-                    <MenuItem value="spa">Spa</MenuItem>
-                    <MenuItem value="massage">Massage</MenuItem>
-                    <MenuItem value="facial">Facial</MenuItem>
+                    {bookingsData?.availableCategories.map((category) => (
+                      <MenuItem key={category.id} value={category.id}>
+                        {category.name}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
 
-                {/* All services Filter */}
+                {/* Options Filter */}
                 <FormControl sx={{ width: '100%' }}>
                   <Select
-                    value={serviceFilter}
-                    onChange={handleServiceChange}
+                    value={optionFilter}
+                    onChange={handleOptionChange}
+                    disabled={categoryFilter === 'all'}
                     IconComponent={KeyboardArrowDownIcon}
                     sx={{
                       height: '40px',
@@ -1098,11 +1042,12 @@ export default function BookingsPage() {
                       },
                     }}
                   >
-                    <MenuItem value="all">All services</MenuItem>
-                    <MenuItem value="haircut">Haircut</MenuItem>
-                    <MenuItem value="spa">Spa</MenuItem>
-                    <MenuItem value="massage">Massage</MenuItem>
-                    <MenuItem value="facial">Facial</MenuItem>
+                    <MenuItem value="all">All Options</MenuItem>
+                    {getFilteredOptions().map((option) => (
+                      <MenuItem key={option.id} value={option.id}>
+                        {option.name}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
 
@@ -1212,7 +1157,7 @@ export default function BookingsPage() {
               </Box>
 
               {/* Modal Content */}
-              {selectedBooking && (
+              {selectedSession && (
                 <Box
                   sx={{
                     display: 'flex',
@@ -1222,6 +1167,19 @@ export default function BookingsPage() {
                     overflow: 'hidden',
                   }}
                 >
+                  {/* Session Info */}
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontSize: '1rem',
+                        fontWeight: 600,
+                        color: theme.palette.custom.heading.dashboard,
+                        mb: 1,
+                      }}
+                    >
+                      Session Details
+                    </Typography>
+
                   {/* Scrollable List of Booked Seats */}
                   <Box
                     sx={{
@@ -1249,9 +1207,44 @@ export default function BookingsPage() {
                       },
                     }}
                   >
-                    {mockBookedSeats.map((seat, index) => (
-                      <BookedSeatCard key={index} seat={seat} />
-                    ))}
+                    {selectedSession.bookings.length > 0 ? (
+                      selectedSession.bookings.map((booking, index) => {
+                        // Calculate seat number based on previous bookings' numberOfSeats
+                        let seatCounter = 0;
+                        for (let i = 0; i < index; i++) {
+                          seatCounter += selectedSession.bookings[i].numberOfSeats;
+                        }
+                        
+                        // Create seat cards for each seat in this booking
+                        const seatCards = [];
+                        for (let seatIndex = 0; seatIndex < booking.numberOfSeats; seatIndex++) {
+                          seatCards.push(
+                            <BookedSeatCard
+                              key={`${booking.id}-${seatIndex}`}
+                              seat={{
+                                seatNumber: `Seat ${seatCounter + seatIndex + 1}`,
+                                customerName: booking.customerName || 'N/A',
+                                email: booking.email || 'N/A',
+                                phone: booking.phone || 'N/A',
+                              }}
+                            />
+                          );
+                        }
+                        return seatCards;
+                      }).flat()
+                    ) : (
+                      <Typography
+                        sx={{
+                          fontFamily: 'Roboto',
+                          fontSize: '14px',
+                          color: '#808080',
+                          textAlign: 'center',
+                          py: 4,
+                        }}
+                      >
+                        No bookings for this session
+                      </Typography>
+                    )}
                   </Box>
                 </Box>
               )}

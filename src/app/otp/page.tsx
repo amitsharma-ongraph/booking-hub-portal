@@ -88,7 +88,11 @@ export default function OTPPage() {
   }, [timer, canResend]);
 
   const onOtpSubmit = async (data: OtpVerificationFormData) => {
-    if (!phoneNumber) {
+    // Get phone number synchronously from storage instead of relying on state
+    // This prevents race conditions where form can be submitted before state is initialized
+    const pendingPhone = authStorage.getPendingPhone();
+    
+    if (!pendingPhone) {
       setLocalError('Phone number not found. Please try again.');
       return;
     }
@@ -97,8 +101,8 @@ export default function OTPPage() {
       clearError();
       setLocalError(null);
       
-      // Verify OTP and get auth token
-      await verifyOtpAndLogin(phoneNumber, data.otp);
+      // Verify OTP and get auth token using phone number from storage
+      await verifyOtpAndLogin(pendingPhone, data.otp);
       
       // Fetch basic company info after login
       await fetchBasicCompanyInfo();
@@ -120,13 +124,20 @@ export default function OTPPage() {
   };
 
   const handleResend = async () => {
-    if (!canResend || !phoneNumber) return;
+    if (!canResend) return;
+
+    // Get phone number synchronously from storage instead of relying on state
+    const pendingPhone = authStorage.getPendingPhone();
+    if (!pendingPhone) {
+      setLocalError('Phone number not found. Please try again.');
+      return;
+    }
 
     try {
       clearError();
       setLocalError(null);
       
-      await requestOtp(phoneNumber);
+      await requestOtp(pendingPhone);
       otpForm.reset({ otp: '' });
       setTimer(60);
       setCanResend(false);
