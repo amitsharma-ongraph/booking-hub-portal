@@ -104,7 +104,7 @@ class AuthService {
    * Get authentication token
    */
   async getAuthToken(data: AuthRequestDto): Promise<AuthResponseDto> {
-    return this.fetchApi<AuthResponseDto>('/token', {
+    return this.fetchApi<AuthResponseDto>('/auth', {
       method: 'POST',
       body: JSON.stringify(data),
     });

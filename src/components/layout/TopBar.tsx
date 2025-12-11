@@ -41,26 +41,27 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
   };
 
   // Get user name from auth context (only after mount to avoid hydration issues)
+  // CompanyDto uses 'name' instead of firstName/lastName
   const userName = mounted && user
-    ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.emailAddress
+    ? user.name || user.emailAddress
     : '';
   
-  // Get account number from user ID (last 9 characters for readability)
-  const accountNumber = mounted && user?.id 
-    ? `Account #${user.id.replace(/-/g, '').slice(-9)}` 
+  // Get account number from company accountNumber field
+  const accountNumber = mounted && user?.accountNumber 
+    ? `Account #${user.accountNumber}` 
     : '';
   
-  // Get profile picture or fallback to default avatar
-  const profilePicture = mounted && user?.profilePicture && !imageError
-    ? user.profilePicture 
+  // Get profile picture (logo) or fallback to default avatar
+  const profilePicture = mounted && user?.logo && !imageError
+    ? user.logo 
     : '/images/avatar.svg';
   
   // Reset image error when user changes
   React.useEffect(() => {
-    if (user?.profilePicture) {
+    if (user?.logo) {
       setImageError(false);
     }
-  }, [user?.profilePicture]);
+  }, [user?.logo]);
 
   return (
     <AppBar

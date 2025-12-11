@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Box,
   Card,
@@ -26,9 +26,18 @@ import CollapsibleCard from '@/components/cards/CollapsibleCard';
 import BookingsTable, { TableColumn, TableRow } from '@/components/tables/BookingsTable';
 import BookedSeatCard, { BookedSeat } from '@/components/cards/BookedSeatCard';
 import { Visibility as VisibilityIcon } from '@mui/icons-material';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 export default function BookingsPage() {
   const theme = useTheme();
+  const { company, isLoading } = useCompanyContext();
+
+  // Log company data from context when it changes
+  useEffect(() => {
+    if (company) {
+      console.log('🏢 Company data in CompanyContext (bookings page):', company);
+    }
+  }, [company]);
   const [dateFilter, setDateFilter] = useState<Date | null>(null);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const dateInputRef = useRef<HTMLDivElement>(null);

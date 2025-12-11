@@ -7,12 +7,12 @@
 
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useAuth } from '@/hooks/auth/useAuth';
-import type { CustomerDto } from '@/lib/api/auth/types';
+import type { BasicCompanyInfo } from '@/hooks/auth/useAuth';
 
 interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
-  user: CustomerDto | null;
+  user: BasicCompanyInfo | null;
   error: string | null;
   requestOtp: (phoneNumber: string) => Promise<string>;
   verifyOtpAndLogin: (phoneNumber: string, otp: string) => Promise<void>;
@@ -22,10 +22,11 @@ interface AuthContextType {
     lastName?: string;
     phoneNumber?: string;
     firebaseToken?: string;
-  }) => Promise<CustomerDto>;
+  }) => Promise<BasicCompanyInfo>;
   logout: () => void;
   validateToken: () => Promise<boolean>;
   clearError: () => void;
+  fetchBasicCompanyInfo: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

@@ -5,6 +5,7 @@ import { Box } from '@mui/material';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
 import { authStorage } from '@/lib/storage/authStorage';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -12,12 +13,15 @@ interface MainLayoutProps {
 
 export default function MainLayout({ children }: MainLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { isAuthenticated, user, fetchBasicCompanyInfo, validateToken } = useAuthContext();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
   // Client-side protection check (backup for middleware)
+  // Note: Auth initialization is handled by useAuth hook at root level
+  // This only checks token existence, doesn't fetch company data
   useEffect(() => {
     // Check if token exists in both localStorage and cookie
     const token = authStorage.getToken();
@@ -29,8 +33,13 @@ export default function MainLayout({ children }: MainLayoutProps) {
     // If no token in either storage, redirect to login
     if (!token && !cookieToken) {
       window.location.href = '/login';
+      return;
     }
-  }, []);
+
+    // Token validation and company data fetching is handled by useAuth hook
+    // which runs once when AuthProvider mounts (at root layout level)
+    // No need to call validateToken here as it would cause unnecessary API calls
+  }, []); // Only run once on mount
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>

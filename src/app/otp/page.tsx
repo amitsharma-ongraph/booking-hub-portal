@@ -25,7 +25,7 @@ import { authStorage } from '@/lib/storage/authStorage';
 export default function OTPPage() {
   const router = useRouter();
   const theme = useTheme();
-  const { verifyOtpAndLogin, requestOtp, error, clearError, isLoading } = useAuthContext();
+  const { verifyOtpAndLogin, requestOtp, error, clearError, isLoading, fetchBasicCompanyInfo } = useAuthContext();
   const [timer, setTimer] = useState(60);
   const [canResend, setCanResend] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
@@ -99,6 +99,9 @@ export default function OTPPage() {
       
       // Verify OTP and get auth token
       await verifyOtpAndLogin(phoneNumber, data.otp);
+      
+      // Fetch basic company info after login
+      await fetchBasicCompanyInfo();
       
       // Force full page reload to ensure middleware runs
       window.location.href = '/onboarding';

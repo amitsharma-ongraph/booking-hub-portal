@@ -5,15 +5,26 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { authService } from '@/lib/api/auth/authService';
+import { companiesService } from '@/lib/api/companies/companiesService';
 import { authStorage } from '@/lib/storage/authStorage';
 import { decodeJwt, isTokenExpired, getUserIdFromToken } from '@/lib/utils/jwt';
 import type { ApiError } from '@/lib/api/client';
 import type { CustomerDto, CustomerCreationDto } from '@/lib/api/auth/types';
+import type { CompanyBasicDto } from '@/lib/api/companies/types';
+
+// Basic company info for AuthContext (just what's needed for TopBar)
+export interface BasicCompanyInfo {
+  id: string;
+  name: string;
+  emailAddress: string;
+  logo: string;
+  accountNumber: string;
+}
 
 interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
-  user: CustomerDto | null;
+  user: BasicCompanyInfo | null;
   error: string | null;
 }
 
@@ -26,12 +37,12 @@ export function useAuth() {
     return {
       isAuthenticated: !!isValid,
       isLoading: false,
-      user: isValid ? (authStorage.getUser() as CustomerDto) || null : null,
+      user: isValid ? (authStorage.getUser() as BasicCompanyInfo) || null : null,
       error: null,
     };
   });
 
-  // Validate token and refresh user data on mount
+  // Validate token and refresh user data on mount (ONLY ONCE when AuthProvider mounts)
   useEffect(() => {
     const token = authStorage.getToken();
     if (!token) {
@@ -51,42 +62,56 @@ export function useAuth() {
       return;
     }
 
-    // If we have token but no user data, fetch it
+    // Check if user data already exists in storage (from previous session)
     const storedUser = authStorage.getUser();
-    if (!storedUser) {
-      const phoneNumber = getUserIdFromToken(token);
-      if (phoneNumber) {
-        setState((prev) => ({ ...prev, isLoading: true }));
-        authService
-          .getCustomerByPhone(phoneNumber)
-          .then((customers) => {
-            if (customers.length > 0) {
-              const user = customers[0];
-              authStorage.setUser(user);
-              setState((prev) => ({
-                ...prev,
-                isAuthenticated: true,
-                user,
-                isLoading: false,
-              }));
-            } else {
-              setState((prev) => ({
-                ...prev,
-                isAuthenticated: false,
-                isLoading: false,
-              }));
-            }
-          })
-          .catch(() => {
+    if (storedUser) {
+      // User data exists, just set it in state (no API call needed)
+      setState((prev) => ({
+        ...prev,
+        isAuthenticated: true,
+        user: storedUser as BasicCompanyInfo,
+      }));
+      return;
+    }
+
+    // Only fetch if we have token but no user data in storage
+    const phoneNumber = getUserIdFromToken(token);
+    if (phoneNumber) {
+      setState((prev) => ({ ...prev, isLoading: true }));
+      // Fetch companies by phone number (service=Spa) - only get basic info
+      companiesService
+        .getCompaniesByPhone(phoneNumber)
+        .then((companies) => {
+          if (companies.length > 0) {
+            // Get the first company's basic info
+            const firstCompany = companies[0];
+            const basicInfo: BasicCompanyInfo = {
+              id: firstCompany.id,
+              name: firstCompany.name,
+              emailAddress: firstCompany.emailAddress,
+              logo: firstCompany.logo,
+              accountNumber: firstCompany.accountNumber,
+            };
+            authStorage.setUser(basicInfo);
             setState((prev) => ({
               ...prev,
-              isAuthenticated: false,
+              isAuthenticated: true,
+              user: basicInfo,
               isLoading: false,
             }));
-          });
-      }
+          } else {
+            throw new Error('No companies found');
+          }
+        })
+        .catch(() => {
+          setState((prev) => ({
+            ...prev,
+            isAuthenticated: false,
+            isLoading: false,
+          }));
+        });
     }
-  }, []); // Only run on mount
+  }, []); // Only run once when AuthProvider mounts (not on page navigation)
 
   /**
    * Set loading state
@@ -153,21 +178,11 @@ export function useAuth() {
         // Store token
         authStorage.setToken(authResponse.token);
 
-        // Decode JWT to get phone number (for verification)
-        const tokenPayload = decodeJwt(authResponse.token);
-        const tokenPhoneNumber = tokenPayload?.sub || phoneNumber;
-
-        // Get user details by phone number from token
-        const customers = await authService.getCustomerByPhone(tokenPhoneNumber);
-        if (customers.length > 0) {
-          const user = customers[0];
-          authStorage.setUser(user);
-          setState((prev) => ({
-            ...prev,
-            isAuthenticated: true,
-            user,
-          }));
-        }
+        // Set authenticated state (company data will be fetched separately)
+        setState((prev) => ({
+          ...prev,
+          isAuthenticated: true,
+        }));
 
         // Clear pending phone
         authStorage.removePendingPhone();
@@ -188,9 +203,10 @@ export function useAuth() {
 
   /**
    * Register new user
+   * Note: Registration still uses customer API
    */
   const register = useCallback(
-    async (data: CustomerCreationDto): Promise<CustomerDto> => {
+    async (data: CustomerCreationDto): Promise<BasicCompanyInfo> => {
       setLoading(true);
       setError(null);
 
@@ -202,7 +218,24 @@ export function useAuth() {
           authStorage.setPendingPhone(customer.phoneNumber);
         }
 
-        return customer;
+        // Try to fetch basic company data if available
+        try {
+          const companies = await companiesService.getCompaniesByPhone(customer.phoneNumber);
+          if (companies.length > 0) {
+            const firstCompany = companies[0];
+            return {
+              id: firstCompany.id,
+              name: firstCompany.name,
+              emailAddress: firstCompany.emailAddress,
+              logo: firstCompany.logo,
+              accountNumber: firstCompany.accountNumber,
+            };
+          }
+        } catch {
+          // If company not found, that's okay - user might not have company yet
+        }
+
+        throw new Error('Company not found. Please contact support.');
       } catch (error) {
         const apiError = error as ApiError;
         const errorMessage =
@@ -217,6 +250,64 @@ export function useAuth() {
     },
     [setLoading, setError]
   );
+
+  /**
+   * Fetch basic company info (called after login or on app load)
+   * Only fetches if user data doesn't already exist
+   */
+  const fetchBasicCompanyInfo = useCallback(async (): Promise<void> => {
+    // Don't fetch if we already have user data
+    if (state.user) {
+      return;
+    }
+
+    const token = authStorage.getToken();
+    if (!token || isTokenExpired(token)) {
+      return;
+    }
+
+    // Check if user data already exists in storage
+    const storedUser = authStorage.getUser();
+    if (storedUser) {
+      setState((prev) => ({
+        ...prev,
+        user: storedUser as BasicCompanyInfo,
+      }));
+      return;
+    }
+
+    const phoneNumber = getUserIdFromToken(token);
+    if (!phoneNumber) {
+      return;
+    }
+
+    try {
+      setState((prev) => ({ ...prev, isLoading: true }));
+      const companies = await companiesService.getCompaniesByPhone(phoneNumber);
+      if (companies.length > 0) {
+        const firstCompany = companies[0];
+        const basicInfo: BasicCompanyInfo = {
+          id: firstCompany.id,
+          name: firstCompany.name,
+          emailAddress: firstCompany.emailAddress,
+          logo: firstCompany.logo,
+          accountNumber: firstCompany.accountNumber,
+        };
+        authStorage.setUser(basicInfo);
+        setState((prev) => ({
+          ...prev,
+          user: basicInfo,
+          isLoading: false,
+        }));
+      }
+    } catch (error) {
+      setState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: (error as ApiError).errorMessage || 'Failed to fetch company info',
+      }));
+    }
+  }, [state.user]);
 
   /**
    * Logout
@@ -268,17 +359,38 @@ export function useAuth() {
       return false;
     }
 
-    // Refresh user data
+    // Check if user data already exists (don't re-fetch if it does)
+    const storedUser = authStorage.getUser();
+    if (storedUser) {
+      setState((prev) => ({
+        ...prev,
+        isAuthenticated: true,
+        user: storedUser as BasicCompanyInfo,
+        isLoading: false,
+      }));
+      return true;
+    }
+
+    // Refresh basic company data (only if not in storage)
     try {
       setState((prev) => ({ ...prev, isLoading: true }));
-      const customers = await authService.getCustomerByPhone(phoneNumber);
-      if (customers.length > 0) {
-        const user = customers[0];
-        authStorage.setUser(user);
+      // Fetch companies by phone number (service=Spa) - only get basic info
+      const companies = await companiesService.getCompaniesByPhone(phoneNumber);
+      if (companies.length > 0) {
+        // Get the first company's basic info
+        const firstCompany = companies[0];
+        const basicInfo: BasicCompanyInfo = {
+          id: firstCompany.id,
+          name: firstCompany.name,
+          emailAddress: firstCompany.emailAddress,
+          logo: firstCompany.logo,
+          accountNumber: firstCompany.accountNumber,
+        };
+        authStorage.setUser(basicInfo);
         setState((prev) => ({
           ...prev,
           isAuthenticated: true,
-          user,
+          user: basicInfo,
           isLoading: false,
         }));
         return true;
@@ -324,6 +436,7 @@ export function useAuth() {
     logout,
     validateToken,
     clearError,
+    fetchBasicCompanyInfo,
   };
 }
 
