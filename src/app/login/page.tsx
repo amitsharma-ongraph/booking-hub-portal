@@ -63,7 +63,7 @@ export default function LoginPage() {
   };
 
   return (
-    <AuthPageLayout cardHeight={{ xs: 'auto', sm: 758 }}>
+    <AuthPageLayout cardHeight={{ xs: 'auto', sm: 600 }}>
       <Box
         sx={{
           display: 'flex',

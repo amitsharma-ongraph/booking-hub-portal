@@ -92,7 +92,7 @@ export default function AuthPageLayout({ children, cardHeight }: AuthPageLayoutP
         />
       </Box>
 
-      {/* Auth Card - Responsive dimensions: 585px width at 1440px, 750px height at 1024px */}
+      {/* Auth Card - Responsive dimensions: 585px width at 1440px, 600px height at 1024px */}
       <Card
         sx={{
           position: 'relative',
@@ -105,12 +105,12 @@ export default function AuthPageLayout({ children, cardHeight }: AuthPageLayoutP
             lg: 585 
           },
           maxWidth: 585,
-          // Height: 750px at 1024px viewport = ~73.2%, responsive for different sizes
+          // Height: 600px at 1024px viewport = ~58.6%, responsive for different sizes
           height: cardHeight || { 
             xs: 'auto',
-            sm: 'min(750px, 73.24vh)', // 750/1024 = 73.24%
-            md: 'min(750px, 73.24vh)',
-            lg: 750
+            sm: 'min(600px, 58.59vh)', // 600/1024 = 58.59%
+            md: 'min(600px, 58.59vh)',
+            lg: 600
           },
           borderRadius: { xs: 3, sm: '30px' },
           boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.08)',
