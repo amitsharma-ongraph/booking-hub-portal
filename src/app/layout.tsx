@@ -5,6 +5,7 @@ import ThemeProvider from '@/components/providers/ThemeProvider';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { CompanyProvider } from '@/contexts/CompanyContext';
 import { CategoriesProvider } from '@/contexts/CategoriesContext';
+import { SchedulesProvider } from '@/contexts/SchedulesContext';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,7 +29,9 @@ export default function RootLayout({
           <AuthProvider>
             <CompanyProvider>
               <CategoriesProvider>
-                {children}
+                <SchedulesProvider>
+                  {children}
+                </SchedulesProvider>
               </CategoriesProvider>
             </CompanyProvider>
           </AuthProvider>
