@@ -5,6 +5,11 @@ import { Box, Typography, Button, useTheme, Card } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import MainLayout from '@/components/layout/MainLayout';
 import CategoryCard, { CategoryOption } from '@/components/categories/CategoryCard';
+import EditCategoryModal from '@/components/categories/EditCategoryModal';
+import AddOptionModal from '@/components/categories/AddOptionModal';
+import DeleteCategoryModal from '@/components/categories/DeleteCategoryModal';
+import EditOptionModal from '@/components/categories/EditOptionModal';
+import DeleteOptionModal from '@/components/categories/DeleteOptionModal';
 
 // Sample data structure - replace with actual data from API/context
 interface Category {
@@ -37,29 +42,158 @@ export default function CategoriesPage() {
     },
   ]);
 
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [addOptionModalOpen, setAddOptionModalOpen] = useState(false);
+  const [addingToCategory, setAddingToCategory] = useState<Category | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
+  const [editOptionModalOpen, setEditOptionModalOpen] = useState(false);
+  const [editingOption, setEditingOption] = useState<{ categoryId: string; option: CategoryOption } | null>(null);
+  const [deleteOptionModalOpen, setDeleteOptionModalOpen] = useState(false);
+  const [deletingOption, setDeletingOption] = useState<{ categoryId: string; option: CategoryOption } | null>(null);
+
   const handleEditCategory = (id: string) => {
-    console.log('Edit category:', id);
-    // TODO: Implement edit category
+    const category = categories.find((cat) => cat.id === id);
+    if (category) {
+      setEditingCategory(category);
+      setEditModalOpen(true);
+    }
+  };
+
+  const handleSaveCategory = (name: string) => {
+    if (editingCategory) {
+      setCategories((prev) =>
+        prev.map((cat) =>
+          cat.id === editingCategory.id ? { ...cat, name } : cat
+        )
+      );
+    }
+    setEditingCategory(null);
+  };
+
+  const handleCloseModal = () => {
+    setEditModalOpen(false);
+    setEditingCategory(null);
   };
 
   const handleAddOption = (categoryId: string) => {
-    console.log('Add option to category:', categoryId);
-    // TODO: Implement add option
+    const category = categories.find((cat) => cat.id === categoryId);
+    if (category) {
+      setAddingToCategory(category);
+      setAddOptionModalOpen(true);
+    }
+  };
+
+  const handleSaveOption = (name: string, price: number) => {
+    if (addingToCategory) {
+      const newOption: CategoryOption = {
+        id: `${addingToCategory.id}-${Date.now()}`,
+        name,
+        price,
+      };
+      setCategories((prev) =>
+        prev.map((cat) =>
+          cat.id === addingToCategory.id
+            ? { ...cat, options: [...cat.options, newOption] }
+            : cat
+        )
+      );
+    }
+    setAddingToCategory(null);
+  };
+
+  const handleCloseAddOptionModal = () => {
+    setAddOptionModalOpen(false);
+    setAddingToCategory(null);
   };
 
   const handleDeleteCategory = (id: string) => {
-    console.log('Delete category:', id);
-    // TODO: Implement delete category
+    const category = categories.find((cat) => cat.id === id);
+    if (category) {
+      setDeletingCategory(category);
+      setDeleteModalOpen(true);
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingCategory) {
+      setCategories((prev) => prev.filter((cat) => cat.id !== deletingCategory.id));
+    }
+    setDeletingCategory(null);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setDeleteModalOpen(false);
+    setDeletingCategory(null);
   };
 
   const handleEditOption = (categoryId: string, optionId: string) => {
-    console.log('Edit option:', categoryId, optionId);
-    // TODO: Implement edit option
+    const category = categories.find((cat) => cat.id === categoryId);
+    if (category) {
+      const option = category.options.find((opt) => opt.id === optionId);
+      if (option) {
+        setEditingOption({ categoryId, option });
+        setEditOptionModalOpen(true);
+      }
+    }
+  };
+
+  const handleSaveEditOption = (name: string, price: number) => {
+    if (editingOption) {
+      setCategories((prev) =>
+        prev.map((cat) =>
+          cat.id === editingOption.categoryId
+            ? {
+                ...cat,
+                options: cat.options.map((opt) =>
+                  opt.id === editingOption.option.id
+                    ? { ...opt, name, price }
+                    : opt
+                ),
+              }
+            : cat
+        )
+      );
+    }
+    setEditingOption(null);
+  };
+
+  const handleCloseEditOptionModal = () => {
+    setEditOptionModalOpen(false);
+    setEditingOption(null);
   };
 
   const handleDeleteOption = (categoryId: string, optionId: string) => {
-    console.log('Delete option:', categoryId, optionId);
-    // TODO: Implement delete option
+    const category = categories.find((cat) => cat.id === categoryId);
+    if (category) {
+      const option = category.options.find((opt) => opt.id === optionId);
+      if (option) {
+        setDeletingOption({ categoryId, option });
+        setDeleteOptionModalOpen(true);
+      }
+    }
+  };
+
+  const handleConfirmDeleteOption = () => {
+    if (deletingOption) {
+      setCategories((prev) =>
+        prev.map((cat) =>
+          cat.id === deletingOption.categoryId
+            ? {
+                ...cat,
+                options: cat.options.filter((opt) => opt.id !== deletingOption.option.id),
+              }
+            : cat
+        )
+      );
+    }
+    setDeletingOption(null);
+  };
+
+  const handleCloseDeleteOptionModal = () => {
+    setDeleteOptionModalOpen(false);
+    setDeletingOption(null);
   };
 
   return (
@@ -302,6 +436,46 @@ export default function CategoriesPage() {
           </Card>
         </Box>
       </Box>
+
+      {/* Edit Category Modal */}
+      <EditCategoryModal
+        open={editModalOpen}
+        onClose={handleCloseModal}
+        categoryName={editingCategory?.name || ''}
+        onSave={handleSaveCategory}
+      />
+
+      {/* Add Option Modal */}
+      <AddOptionModal
+        open={addOptionModalOpen}
+        onClose={handleCloseAddOptionModal}
+        onSave={handleSaveOption}
+      />
+
+      {/* Delete Category Modal */}
+      <DeleteCategoryModal
+        open={deleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        categoryName={deletingCategory?.name || ''}
+        onDelete={handleConfirmDelete}
+      />
+
+      {/* Edit Option Modal */}
+      <EditOptionModal
+        open={editOptionModalOpen}
+        onClose={handleCloseEditOptionModal}
+        optionName={editingOption?.option.name || ''}
+        optionPrice={editingOption?.option.price || 0}
+        onSave={handleSaveEditOption}
+      />
+
+      {/* Delete Option Modal */}
+      <DeleteOptionModal
+        open={deleteOptionModalOpen}
+        onClose={handleCloseDeleteOptionModal}
+        optionName={deletingOption?.option.name || ''}
+        onDelete={handleConfirmDeleteOption}
+      />
     </MainLayout>
   );
 }
