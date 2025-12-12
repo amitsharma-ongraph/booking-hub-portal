@@ -7,7 +7,8 @@ export interface DeleteCategoryModalProps {
   open: boolean;
   onClose: () => void;
   categoryName: string;
-  onDelete: () => void;
+  onDelete: () => Promise<void> | void;
+  isLoading?: boolean;
 }
 
 export default function DeleteCategoryModal({
@@ -15,10 +16,20 @@ export default function DeleteCategoryModal({
   onClose,
   categoryName,
   onDelete,
+  isLoading = false,
 }: DeleteCategoryModalProps) {
-  const handleDelete = () => {
-    onDelete();
-    onClose();
+  const handleDelete = async () => {
+    if (isLoading) {
+      return;
+    }
+
+    try {
+      await onDelete();
+      // onDelete handles closing the modal on success
+    } catch (error) {
+      // Error handling - modal stays open so user can retry
+      console.error('Error deleting category:', error);
+    }
   };
 
   return (
@@ -169,6 +180,7 @@ export default function DeleteCategoryModal({
             <Button
               variant="contained"
               onClick={handleDelete}
+              disabled={isLoading}
               sx={{
                 flex: 1,
                 height: '41px',
@@ -186,9 +198,14 @@ export default function DeleteCategoryModal({
                   backgroundColor: '#B8908F',
                   boxShadow: 'none',
                 },
+                '&:disabled': {
+                  backgroundColor: '#CFA09F',
+                  opacity: 0.4,
+                  color: '#FFFFFF',
+                },
               }}
             >
-              Delete
+              {isLoading ? 'Deleting...' : 'Delete'}
             </Button>
           </Box>
         </Box>

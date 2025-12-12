@@ -3,28 +3,26 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Box, Typography, TextField, Button } from '@mui/material';
 
-export interface EditCategoryModalProps {
+export interface AddCategoryModalProps {
   open: boolean;
   onClose: () => void;
-  categoryName?: string;
   onSave: (name: string) => Promise<void> | void;
   isLoading?: boolean;
 }
 
-export default function EditCategoryModal({
+export default function AddCategoryModal({
   open,
   onClose,
-  categoryName = '',
   onSave,
   isLoading = false,
-}: EditCategoryModalProps) {
-  const [name, setName] = useState(categoryName);
+}: AddCategoryModalProps) {
+  const [name, setName] = useState('');
 
   useEffect(() => {
     if (open) {
-      setName(categoryName);
+      setName('');
     }
-  }, [open, categoryName]);
+  }, [open]);
 
   const handleSave = async () => {
     if (name.trim() && !isLoading) {
@@ -39,7 +37,7 @@ export default function EditCategoryModal({
   };
 
   const handleClose = () => {
-    setName(categoryName);
+    setName('');
     onClose();
   };
 
@@ -104,7 +102,7 @@ export default function EditCategoryModal({
                 flex: 1,
               }}
             >
-              Edit Category
+              Add Category
             </Typography>
           </Box>
         </Box>

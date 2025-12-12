@@ -8,7 +8,8 @@ export interface EditOptionModalProps {
   onClose: () => void;
   optionName?: string;
   optionPrice?: number;
-  onSave: (name: string, price: number) => void;
+  onSave: (name: string, price: number) => Promise<void> | void;
+  isLoading?: boolean;
 }
 
 export default function EditOptionModal({
@@ -17,6 +18,7 @@ export default function EditOptionModal({
   optionName = '',
   optionPrice = 0,
   onSave,
+  isLoading = false,
 }: EditOptionModalProps) {
   const [name, setName] = useState(optionName);
   const [price, setPrice] = useState(optionPrice.toString());
@@ -28,11 +30,16 @@ export default function EditOptionModal({
     }
   }, [open, optionName, optionPrice]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const priceNum = parseFloat(price);
-    if (name.trim() && !isNaN(priceNum) && priceNum >= 0) {
-      onSave(name.trim(), priceNum);
-      onClose();
+    if (name.trim() && !isNaN(priceNum) && priceNum >= 0 && !isLoading) {
+      try {
+        await onSave(name.trim(), priceNum);
+        // onSave handles closing the modal on success
+      } catch (error) {
+        // Error handling - modal stays open so user can retry
+        console.error('Error saving option:', error);
+      }
     }
   };
 
@@ -317,7 +324,7 @@ export default function EditOptionModal({
             <Button
               variant="contained"
               onClick={handleSave}
-              disabled={!name.trim() || !price || parseFloat(price) < 0}
+              disabled={!name.trim() || !price || parseFloat(price) < 0 || isLoading}
               sx={{
                 flex: 1,
                 height: '41px',
@@ -342,7 +349,7 @@ export default function EditOptionModal({
                 },
               }}
             >
-              Save
+              {isLoading ? 'Saving...' : 'Save'}
             </Button>
           </Box>
         </Box>
