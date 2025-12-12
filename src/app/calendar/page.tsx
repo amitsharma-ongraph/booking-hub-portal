@@ -29,6 +29,7 @@ import { useSchedulesContext } from '@/contexts/SchedulesContext';
 import { useSchedules, type BookingSession, type DateEvent } from '@/hooks/schedules/useSchedules';
 import type { Booking } from '@/lib/api/schedules/types';
 import LoadingSpinner from '@/components/loaders/LoadingSpinner';
+import AddScheduleModal from '@/components/schedules/AddScheduleModal';
 
 export default function CalendarPage() {
   const theme = useTheme();
@@ -40,6 +41,7 @@ export default function CalendarPage() {
     format(new Date(), 'yyyy-MM-dd')
   );
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [addScheduleModalOpen, setAddScheduleModalOpen] = useState(false);
 
   console.log("schedules",schedules)
 
@@ -303,6 +305,7 @@ export default function CalendarPage() {
             <Button
               variant="contained"
               startIcon={<AddIcon />}
+              onClick={() => setAddScheduleModalOpen(true)}
               sx={{
                 width: '152px',
                 height: '41px',
@@ -1233,6 +1236,19 @@ export default function CalendarPage() {
           </Box>
         )}
       </Drawer>
+
+      {/* Add Schedule Modal */}
+      <AddScheduleModal
+        open={addScheduleModalOpen}
+        onClose={() => setAddScheduleModalOpen(false)}
+        onSave={async (scheduleData) => {
+          // TODO: Implement schedule creation API call
+          console.log('Schedule data to save:', scheduleData);
+          // For now, just close the modal
+          setAddScheduleModalOpen(false);
+        }}
+        isLoading={false}
+      />
     </MainLayout>
   );
 }
