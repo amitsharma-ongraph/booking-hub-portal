@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Box, Typography, Grid, TextField, Button } from '@mui/material';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Box, Typography, Grid, TextField, Button, Alert, Snackbar } from '@mui/material';
 import ProfilePictureEditor from '@/components/profile/ProfilePictureEditor';
+import { useCompanyContext } from '@/contexts/CompanyContext';
+import type { CompanyDto } from '@/lib/api/companies/types';
 
 interface FormData {
   tenantName: string;
@@ -19,66 +21,51 @@ interface FormData {
 }
 
 interface ProfileTabContentProps {
-  initialData?: {
-    firstName: string;
-    lastName: string;
-    emailAddress: string;
-    phoneNumber: string;
-    profilePicture?: string | null;
-  };
+  company: CompanyDto;
 }
 
-export default function ProfileTabContent({ initialData }: ProfileTabContentProps) {
-  const defaultData = {
-    tenantName: '',
-    tenantEmail: '',
-    accountNumber: '',
-    location: '',
-    streetName: '',
-    state: '',
-    about: '',
-    field1: '',
-    field2: '',
-    field3: '',
-    field4: '',
-    profilePicture: null,
-  };
-
-  const userData = initialData || defaultData;
+export default function ProfileTabContent({ company }: ProfileTabContentProps) {
+  const { updateCompany, isLoading: isContextLoading } = useCompanyContext();
+  
+  // Initialize form data from company
+  const initializeFormData = useCallback((): FormData => ({
+    tenantName: company.name || '',
+    tenantEmail: company.emailAddress || '',
+    accountNumber: company.accountNumber || '',
+    location: company.location || '',
+    streetName: '', // Not available in company object
+    state: '', // Not available in company object
+    about: company.description || '',
+    field1: company.phoneNumber || '',
+    field2: company.whatsappNumber || '',
+    field3: company.tiktokUrl || '',
+    field4: company.instagramUrl || '',
+  }), [company]);
 
   // Form state
-  const [formData, setFormData] = useState<FormData>({
-    tenantName: defaultData.tenantName,
-    tenantEmail: defaultData.tenantEmail,
-    accountNumber: defaultData.accountNumber,
-    location: defaultData.location,
-    streetName: defaultData.streetName,
-    state: defaultData.state,
-    about: defaultData.about,
-    field1: defaultData.field1,
-    field2: defaultData.field2,
-    field3: defaultData.field3,
-    field4: defaultData.field4,
-  });
+  const [formData, setFormData] = useState<FormData>(initializeFormData());
 
   // Initial values to track dirty state
-  const [initialFormData, setInitialFormData] = useState<FormData>({
-    tenantName: defaultData.tenantName,
-    tenantEmail: defaultData.tenantEmail,
-    accountNumber: defaultData.accountNumber,
-    location: defaultData.location,
-    streetName: defaultData.streetName,
-    state: defaultData.state,
-    about: defaultData.about,
-    field1: defaultData.field1,
-    field2: defaultData.field2,
-    field3: defaultData.field3,
-    field4: defaultData.field4,
-  });
+  const [initialFormData, setInitialFormData] = useState<FormData>(initializeFormData());
 
   // Profile picture state
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [initialProfilePicture, setInitialProfilePicture] = useState<File | null>(null);
+
+  // Loading and error states
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Update form when company data changes
+  useEffect(() => {
+    const newFormData = initializeFormData();
+    setFormData(newFormData);
+    setInitialFormData(newFormData);
+    // Reset profile picture when company changes
+    setProfilePicture(null);
+    setInitialProfilePicture(null);
+  }, [initializeFormData]);
 
   const userInitials = formData.tenantName ? `${formData.tenantName.charAt(0)}` : 'TN';
 
@@ -113,16 +100,88 @@ export default function ProfileTabContent({ initialData }: ProfileTabContentProp
     setProfilePicture(file);
   };
 
-  const handleSave = () => {
-    // TODO: Implement save functionality
-    console.log('Saving profile:', formData);
-    if (profilePicture) {
-      console.log('Saving profile picture:', profilePicture);
+  /**
+   * Convert File to base64 string
+   */
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const result = reader.result as string;
+        // Remove data URL prefix (e.g., "data:image/png;base64,")
+        const base64 = result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const handleSave = async () => {
+    if (isSaving || isContextLoading) {
+      return;
     }
 
-    // Update initial values after save
-    setInitialFormData({ ...formData });
-    setInitialProfilePicture(profilePicture);
+    setIsSaving(true);
+    setSaveError(null);
+    setSaveSuccess(false);
+
+    try {
+      // Convert logo file to base64 if a new file is selected
+      // Otherwise, send empty string (API will keep existing logo)
+      let logoBase64 = '';
+      if (profilePicture) {
+        logoBase64 = await fileToBase64(profilePicture);
+      }
+
+      // Map form data to UpdateCompanyRequestDto
+      const updateData = {
+        name: formData.tenantName.trim(),
+        emailAddress: formData.tenantEmail.trim(),
+        accountNumber: formData.accountNumber.trim(),
+        location: formData.location.trim(),
+        description: formData.about.trim(),
+        phoneNumber: formData.field1.trim(),
+        whatsappNumber: formData.field2.trim(),
+        logo: logoBase64, // Base64 string or empty string
+        tiktokUrl: formData.field3.trim(),
+        instagramUrl: formData.field4.trim(),
+        firebaseToken: company.firebaseToken || '',
+        services: company.services?.map((service) => service.id) || [],
+      };
+
+      // Validate required fields
+      if (!updateData.name || !updateData.emailAddress) {
+        throw new Error('Name and email are required fields');
+      }
+
+      // Call update API
+      await updateCompany(updateData);
+
+      // Update initial values after successful save
+      setInitialFormData({ ...formData });
+      setInitialProfilePicture(profilePicture);
+      setSaveSuccess(true);
+
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSaveSuccess(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Failed to save profile:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save profile. Please try again.';
+      setSaveError(errorMessage);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCloseError = () => {
+    setSaveError(null);
+  };
+
+  const handleCloseSuccess = () => {
+    setSaveSuccess(false);
   };
 
   return (
@@ -134,6 +193,29 @@ export default function ProfileTabContent({ initialData }: ProfileTabContentProp
         width: '100%',
       }}
     >
+      {/* Error Snackbar */}
+      <Snackbar
+        open={!!saveError}
+        autoHideDuration={6000}
+        onClose={handleCloseError}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseError} severity="error" sx={{ width: '100%' }}>
+          {saveError}
+        </Alert>
+      </Snackbar>
+
+      {/* Success Snackbar */}
+      <Snackbar
+        open={saveSuccess}
+        autoHideDuration={3000}
+        onClose={handleCloseSuccess}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSuccess} severity="success" sx={{ width: '100%' }}>
+          Profile updated successfully!
+        </Alert>
+      </Snackbar>
       {/* Logo Label and Profile Picture Editor */}
       <Box
         sx={{
@@ -157,7 +239,7 @@ export default function ProfileTabContent({ initialData }: ProfileTabContentProp
           Logo
         </Typography>
         <ProfilePictureEditor
-          src={userData.profilePicture || null}
+          src={company.logo || null}
           initials={userInitials}
           onChange={handleProfilePictureChange}
         />
@@ -1074,6 +1156,7 @@ export default function ProfileTabContent({ initialData }: ProfileTabContentProp
                 <Button
                   variant="contained"
                   onClick={handleSave}
+                  disabled={isSaving || isContextLoading}
                   sx={{
                     minWidth: '150px',
                     height: '44px',
@@ -1081,9 +1164,17 @@ export default function ProfileTabContent({ initialData }: ProfileTabContentProp
                     textTransform: 'none',
                     fontSize: '16px',
                     fontWeight: 700,
+                    backgroundColor: '#CFA09F',
+                    '&:hover': {
+                      backgroundColor: '#B8908F',
+                    },
+                    '&:disabled': {
+                      backgroundColor: '#CFA09F',
+                      opacity: 0.6,
+                    },
                   }}
                 >
-                  Save Changes
+                  {isSaving ? 'Saving...' : 'Save Changes'}
                 </Button>
               </Box>
             </Grid>

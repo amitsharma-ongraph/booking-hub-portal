@@ -10,9 +10,13 @@ import {
   Box,
   useTheme,
 } from '@mui/material';
-import { mockRatings } from '@/data/mockData';
+import type { CompanyDto } from '@/lib/api/companies/types';
 
-export default function RatingsTabContent() {
+interface RatingsTabContentProps {
+  company: CompanyDto;
+}
+
+export default function RatingsTabContent({ company }: RatingsTabContentProps) {
   const theme = useTheme();
 
   // Format date to a more readable format
@@ -25,13 +29,49 @@ export default function RatingsTabContent() {
     });
   };
 
+  // Format time from date string
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
+  };
+
+  const ratings = company.ratings || [];
+
+  if (ratings.length === 0) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '200px',
+        }}
+      >
+        <Typography
+          sx={{
+            fontFamily: 'Roboto',
+            fontSize: '14px',
+            color: '#B0B0B0',
+            fontStyle: 'italic',
+          }}
+        >
+          No ratings available yet.
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
     <Grid container spacing={3}>
-      {mockRatings.map((review) => (
-        <Grid size={{ xs: 12 }} key={review.id}>
+      {ratings.map((rating) => (
+        <Grid size={{ xs: 12 }} key={rating.id}>
           <Card
             sx={{
-              backgroundColor: theme.palette.custom.background.white,
+              backgroundColor: theme.palette.custom?.background?.white || '#FFFFFF',
               borderRadius: '15.5796px',
               boxShadow: '0px 0px 0px 1px rgba(0, 0, 0, 0.1)',
               width: '100%',
@@ -57,16 +97,16 @@ export default function RatingsTabContent() {
                   variant="subtitle1"
                   fontWeight={600}
                   sx={{
-                    color: theme.palette.custom.heading.dark,
+                    color: theme.palette.custom?.heading?.dark || '#041C2C',
                     fontSize: '1rem',
                     lineHeight: 1.5,
                   }}
                 >
-                  {review.customerName}
+                  {rating.customerName}
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Rating
-                    value={review.rating}
+                    value={rating.score}
                     readOnly
                     size="small"
                     sx={{
@@ -86,12 +126,12 @@ export default function RatingsTabContent() {
                       fontWeight: 600,
                     }}
                   >
-                    {review.rating}
+                    {rating.score}
                   </Typography>
                 </Box>
               </Box>
 
-              {/* Second Row: Comment */}
+              {/* Second Row: Comment/Feedback */}
               <Typography
                 variant="body2"
                 sx={{
@@ -100,7 +140,7 @@ export default function RatingsTabContent() {
                   lineHeight: 1.6,
                 }}
               >
-                {review.comment}
+                {rating.feedback || 'No feedback provided.'}
               </Typography>
 
               {/* Third Row: Date and Time */}
@@ -112,13 +152,13 @@ export default function RatingsTabContent() {
                     fontSize: '0.75rem',
                   }}
                 >
-                  {formatDate(review.date)}
+                  {formatDate(rating.creationDate)}
                 </Typography>
                 <Box
                   sx={{
                     width: '1px',
                     height: '12px',
-                    backgroundColor: theme.palette.custom.border.divider,
+                    backgroundColor: theme.palette.custom?.border?.divider || '#E0E0E0',
                   }}
                 />
                 <Typography
@@ -128,7 +168,7 @@ export default function RatingsTabContent() {
                     fontSize: '0.75rem',
                   }}
                 >
-                  {review.time}
+                  {formatTime(rating.creationDate)}
                 </Typography>
               </Box>
             </CardContent>

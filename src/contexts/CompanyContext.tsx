@@ -9,7 +9,7 @@
 import React, { createContext, useContext, ReactNode, useState, useCallback, useEffect } from 'react';
 import { companiesService } from '@/lib/api/companies/companiesService';
 import { useAuthContext } from './AuthContext';
-import type { CompanyDto } from '@/lib/api/companies/types';
+import type { CompanyDto, UpdateCompanyRequestDto } from '@/lib/api/companies/types';
 import type { ApiError } from '@/lib/api/client';
 
 interface CompanyContextType {
@@ -17,6 +17,7 @@ interface CompanyContextType {
   isLoading: boolean;
   error: string | null;
   refreshCompany: () => Promise<void>;
+  updateCompany: (data: UpdateCompanyRequestDto) => Promise<void>;
   clearError: () => void;
 }
 
@@ -96,6 +97,36 @@ export function CompanyProvider({ children }: { children: ReactNode }) {
   }, [currentCompanyId, user?.id, company?.id, fetchCompanyDetails]);
 
   /**
+   * Update company data
+   * Updates the company and refreshes the data
+   */
+  const updateCompany = useCallback(async (data: UpdateCompanyRequestDto) => {
+    const companyIdToUpdate = company?.id || currentCompanyId || user?.id;
+    
+    if (!companyIdToUpdate) {
+      throw new Error('Cannot update company: no company ID available');
+    }
+
+    console.log('🔄 Updating company:', companyIdToUpdate, data);
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const updatedCompany = await companiesService.updateCompany(companyIdToUpdate, data);
+      console.log('✅ Company updated successfully:', updatedCompany);
+      setCompanyState(updatedCompany);
+      setCurrentCompanyId(companyIdToUpdate);
+    } catch (err) {
+      const apiError = err as ApiError;
+      console.error('❌ Error updating company:', err);
+      setError(apiError.errorMessage || 'Failed to update company');
+      throw err; // Re-throw so caller can handle it
+    } finally {
+      setIsLoading(false);
+    }
+  }, [company?.id, currentCompanyId, user?.id]);
+
+  /**
    * Clear error
    */
   const clearError = useCallback(() => {
@@ -109,6 +140,7 @@ export function CompanyProvider({ children }: { children: ReactNode }) {
         isLoading,
         error,
         refreshCompany,
+        updateCompany,
         clearError,
       }}
     >

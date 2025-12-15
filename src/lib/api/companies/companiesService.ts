@@ -88,6 +88,17 @@ class CompaniesService {
       method: 'GET',
     });
   }
+
+  /**
+   * Update company by ID
+   * Uses PUT method to update the entire company resource
+   */
+  async updateCompany(id: string, data: import('./types').UpdateCompanyRequestDto): Promise<CompanyDto> {
+    return this.fetchApi<CompanyDto>(`/companies/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
 }
 
 export const companiesService = new CompaniesService();

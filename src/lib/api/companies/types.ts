@@ -99,4 +99,22 @@ export interface CompanyBasicDto {
   categories: Category[];
 }
 
+/**
+ * Request DTO for updating a company
+ */
+export interface UpdateCompanyRequestDto {
+  name: string;
+  emailAddress: string;
+  accountNumber: string;
+  location: string;
+  description: string;
+  phoneNumber: string;
+  whatsappNumber: string;
+  logo: string;
+  tiktokUrl: string;
+  instagramUrl: string;
+  firebaseToken: string;
+  services: string[];
+}
+
 

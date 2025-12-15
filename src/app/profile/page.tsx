@@ -1,26 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, CircularProgress, Alert } from '@mui/material';
 import MainLayout from '@/components/layout/MainLayout';
 import ProfileTabs from '@/components/profile/ProfileTabs';
 import ProfileTabContent from '@/components/profile/ProfileTabContent';
 import AboutTabContent from '@/components/profile/AboutTabContent';
 import RatingsTabContent from '@/components/profile/RatingsTabContent';
-
-// Mock data for now
-const mockUserData = {
-  firstName: 'John',
-  lastName: 'Doe',
-  emailAddress: 'john.doe@example.com',
-  phoneNumber: '+1 234-567-8900',
-  userId: '123456789',
-  accountNumber: 'Account #123456789',
-  profilePicture: null,
-};
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('profile');
+  const { company, isLoading, error } = useCompanyContext();
 
   const tabs = [
     { id: 'profile', label: 'Profile' },
@@ -29,15 +20,39 @@ export default function ProfilePage() {
   ];
 
   const renderTabContent = () => {
+    if (isLoading) {
+      return (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+          <CircularProgress />
+        </Box>
+      );
+    }
+
+    if (error) {
+      return (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      );
+    }
+
+    if (!company) {
+      return (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          No company data available. Please ensure you are logged in.
+        </Alert>
+      );
+    }
+
     switch (activeTab) {
       case 'profile':
-        return <ProfileTabContent initialData={mockUserData} />;
+        return <ProfileTabContent company={company} />;
       case 'settings':
-        return <AboutTabContent />;
+        return <AboutTabContent company={company} />;
       case 'ratings':
-        return <RatingsTabContent />;
+        return <RatingsTabContent company={company} />;
       default:
-        return <ProfileTabContent initialData={mockUserData} />;
+        return <ProfileTabContent company={company} />;
     }
   };
 
