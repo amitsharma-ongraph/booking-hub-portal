@@ -32,23 +32,28 @@ export function CompanyProvider({ children }: { children: ReactNode }) {
   /**
    * Fetch detailed company data by ID
    * Internal function used by auto-fetch and refresh
+   * @param companyId - The company ID to fetch
+   * @param force - If true, force refetch even if data already exists
    */
-  const fetchCompanyDetails = useCallback(async (companyId: string) => {
-    // If we already have this company's data and no error, don't fetch again
-    if (company?.id === companyId && !error) {
+  const fetchCompanyDetails = useCallback(async (companyId: string, force: boolean = false) => {
+    // If we already have this company's data and no error, don't fetch again (unless forced)
+    if (!force && company?.id === companyId && !error) {
+      console.log('⏭️ Skipping fetch - company data already exists and not forced');
       return;
     }
 
+    console.log('📡 Making API call to fetch company:', companyId, { force });
     setIsLoading(true);
     setError(null);
 
     try {
       const companyData = await companiesService.getCompanyById(companyId);
-      console.log('🏢 Company data fetched in CompanyContext:', companyData);
+      console.log('✅ Company data fetched in CompanyContext:', companyData);
       setCompanyState(companyData);
       setCurrentCompanyId(companyId);
     } catch (err) {
       const apiError = err as ApiError;
+      console.error('❌ Error fetching company:', err);
       setError(apiError.errorMessage || 'Failed to fetch company details');
       setCompanyState(null);
     } finally {
@@ -74,15 +79,21 @@ export function CompanyProvider({ children }: { children: ReactNode }) {
   /**
    * Refresh company data (re-fetch current company)
    * Useful when you need fresh data (e.g., after updates)
+   * Forces a refetch even if data already exists
    */
   const refreshCompany = useCallback(async () => {
-    if (currentCompanyId) {
-      await fetchCompanyDetails(currentCompanyId);
-    } else if (user?.id) {
-      // If no currentCompanyId but we have user ID, fetch it
-      await fetchCompanyDetails(user.id);
+    console.log('🔄 refreshCompany called', { currentCompanyId, userId: user?.id, companyId: company?.id });
+    
+    // Use company.id if available (most reliable), otherwise fall back to currentCompanyId or user.id
+    const companyIdToFetch = company?.id || currentCompanyId || user?.id;
+    
+    if (companyIdToFetch) {
+      console.log('📡 Fetching company data for ID:', companyIdToFetch);
+      await fetchCompanyDetails(companyIdToFetch, true); // Force refetch
+    } else {
+      console.warn('⚠️ Cannot refresh company: no company ID available', { currentCompanyId, userId: user?.id, companyId: company?.id });
     }
-  }, [currentCompanyId, user?.id, fetchCompanyDetails]);
+  }, [currentCompanyId, user?.id, company?.id, fetchCompanyDetails]);
 
   /**
    * Clear error

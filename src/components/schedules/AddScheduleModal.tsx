@@ -26,15 +26,14 @@ export interface AddScheduleModalProps {
   open: boolean;
   onClose: () => void;
   onSave: (scheduleData: {
-    scheduleName: string;
     startDate: string;
     endDate: string;
-    startTime: string;
-    endTime: string;
-    categoryId: string;
     categoryOptionId: string;
-    numberOfSeats: number;
-    description: string;
+    sessions: Array<{
+      startTime: string;
+      endTime: string;
+      totalNumberOfSeats: number;
+    }>;
   }) => Promise<void> | void;
   isLoading?: boolean;
 }
@@ -76,9 +75,18 @@ export default function AddScheduleModal({
       setCategoryId('');
       setCategoryOptionId('');
       setNumberOfSeats(1);
-      setSessions([]);
+      setSessions([
+        {
+          id: Date.now().toString(),
+          startTime: '',
+          endTime: '',
+        },
+      ]);
       setDatePickerOpen(false);
       setTimePickerOpen(false);
+      setTimePickerAnchor(null);
+      setTimePickerSessionId(null);
+      setTimePickerField(null);
     }
   }, [open]);
 
@@ -142,7 +150,21 @@ export default function AddScheduleModal({
   };
 
   const handleTimePickerChange = (part: 'hour' | 'minute' | 'ampm', value: string) => {
-    setTimePickerValue((prev) => ({ ...prev, [part]: value }));
+    setTimePickerValue((prev) => {
+      const next = { ...prev, [part]: value };
+      // Update the session time immediately so validation reflects changes
+      if (timePickerSessionId && timePickerField) {
+        const time24 = convert12HourTo24Hour(next.hour, next.minute, next.ampm);
+        setSessions((sessionsState) =>
+          sessionsState.map((session) =>
+            session.id === timePickerSessionId
+              ? { ...session, [timePickerField]: time24 }
+              : session
+          )
+        );
+      }
+      return next;
+    });
   };
 
   const handleTimePickerConfirm = () => {
@@ -173,6 +195,11 @@ export default function AddScheduleModal({
     setTimePickerField(null);
   };
 
+  const combineDateAndTime = (dateStr: string, timeStr: string) => {
+    // Create ISO string using UTC to avoid timezone offsets
+    return new Date(`${dateStr}T${timeStr}:00Z`).toISOString();
+  };
+
   const handleSave = async () => {
     if (
       startDate &&
@@ -189,15 +216,14 @@ export default function AddScheduleModal({
         const endDateFormatted = format(endDate, 'yyyy-MM-dd');
         
         await onSave({
-          scheduleName: '',
-          startDate: startDateFormatted,
-          endDate: endDateFormatted,
-          startTime: '',
-          endTime: '',
-          categoryId,
+          startDate: new Date(`${startDateFormatted}T00:00:00Z`).toISOString(),
+          endDate: new Date(`${endDateFormatted}T23:59:59Z`).toISOString(),
           categoryOptionId,
-          numberOfSeats,
-          description: '',
+          sessions: sessions.map((session) => ({
+            startTime: combineDateAndTime(startDateFormatted, session.startTime),
+            endTime: combineDateAndTime(endDateFormatted, session.endTime),
+            totalNumberOfSeats: numberOfSeats,
+          })),
         });
       } catch (error) {
         console.error('Error saving schedule:', error);
@@ -213,6 +239,10 @@ export default function AddScheduleModal({
     setNumberOfSeats(1);
     setSessions([]);
     setDatePickerOpen(false);
+    setTimePickerOpen(false);
+    setTimePickerAnchor(null);
+    setTimePickerSessionId(null);
+    setTimePickerField(null);
     onClose();
   };
 

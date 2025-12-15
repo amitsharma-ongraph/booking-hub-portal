@@ -28,13 +28,16 @@ import MainLayout from '@/components/layout/MainLayout';
 import { useSchedulesContext } from '@/contexts/SchedulesContext';
 import { useSchedules, type BookingSession, type DateEvent } from '@/hooks/schedules/useSchedules';
 import type { Booking } from '@/lib/api/schedules/types';
+import { schedulesService } from '@/lib/api/schedules/schedulesService';
+import { useAuthContext } from '@/contexts/AuthContext';
 import LoadingSpinner from '@/components/loaders/LoadingSpinner';
 import AddScheduleModal from '@/components/schedules/AddScheduleModal';
 
 export default function CalendarPage() {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md')); // Below 900px
-  const { schedules, isLoading } = useSchedulesContext();
+  const { schedules, isLoading, addSchedule } = useSchedulesContext();
+  const { user } = useAuthContext();
   const { getDateEvents } = useSchedules();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(
@@ -42,6 +45,7 @@ export default function CalendarPage() {
   );
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [addScheduleModalOpen, setAddScheduleModalOpen] = useState(false);
+  const [savingSchedule, setSavingSchedule] = useState(false);
 
   console.log("schedules",schedules)
 
@@ -1242,12 +1246,30 @@ export default function CalendarPage() {
         open={addScheduleModalOpen}
         onClose={() => setAddScheduleModalOpen(false)}
         onSave={async (scheduleData) => {
-          // TODO: Implement schedule creation API call
-          console.log('Schedule data to save:', scheduleData);
-          // For now, just close the modal
-          setAddScheduleModalOpen(false);
+          if (!user?.id) {
+            console.error('Cannot create schedule: missing company ID');
+            return;
+          }
+
+          setSavingSchedule(true);
+          try {
+            const createdSchedule = await schedulesService.createSchedule({
+              companyId: user.id,
+              categoryOptionId: scheduleData.categoryOptionId,
+              startDate: scheduleData.startDate,
+              endDate: scheduleData.endDate,
+              sessions: scheduleData.sessions,
+            });
+
+            addSchedule(createdSchedule);
+            setAddScheduleModalOpen(false);
+          } catch (error) {
+            console.error('Failed to create schedule:', error);
+          } finally {
+            setSavingSchedule(false);
+          }
         }}
-        isLoading={false}
+        isLoading={savingSchedule}
       />
     </MainLayout>
   );

@@ -32,12 +32,20 @@ import LoadingSpinner from '@/components/loaders/LoadingSpinner';
 
 export default function BookingsPage() {
   const theme = useTheme();
-  const { company, isLoading } = useCompanyContext();
+  const { company, isLoading, refreshCompany } = useCompanyContext();
   const { getBookingsData } = useCompanies();
 
   const [dateFilter, setDateFilter] = useState<Date | null>(null);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const dateInputRef = useRef<HTMLDivElement>(null);
+
+  // Always refetch company/bookings data when landing on bookings page
+  useEffect(() => {
+    console.log('🔄 Bookings page mounted - calling refreshCompany');
+    refreshCompany().catch((error) => {
+      console.error('❌ Error refreshing company:', error);
+    });
+  }, [refreshCompany]);
 
   // Set initial date filter from bookings data when company loads (only if dateFilter is null)
   useEffect(() => {

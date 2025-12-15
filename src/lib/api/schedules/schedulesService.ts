@@ -74,6 +74,26 @@ class SchedulesService {
       method: 'GET',
     });
   }
+
+  /**
+   * Create a new schedule
+   */
+  async createSchedule(data: {
+    companyId: string;
+    categoryOptionId: string;
+    startDate: string;
+    endDate: string;
+    sessions: Array<{
+      totalNumberOfSeats: number;
+      startTime: string;
+      endTime: string;
+    }>;
+  }): Promise<ScheduleDto> {
+    return this.fetchApi<ScheduleDto>(`/schedules`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
 }
 
 export const schedulesService = new SchedulesService();
