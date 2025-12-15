@@ -92,6 +92,7 @@ export default function AuthPageLayout({ children, cardHeight }: AuthPageLayoutP
         />
       </Box>
 
+<Box sx={{minHeight:"800px",display:"flex",justifyContent:"center",alignItems:"center"}}>
       {/* Auth Card - Responsive dimensions: 585px width at 1440px, 600px height at 1024px */}
       <Card
         sx={{
@@ -125,6 +126,7 @@ export default function AuthPageLayout({ children, cardHeight }: AuthPageLayoutP
       >
         {children}
       </Card>
+      </Box>
     </Box>
   );
 }
