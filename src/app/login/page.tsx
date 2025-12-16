@@ -44,11 +44,8 @@ export default function LoginPage() {
       clearError();
       setLocalError(null);
       
-      // Always prepend +966 for Saudi numbers
-      const fullPhoneNumber = `+966${data.phoneNumber.replace(/\s/g, '')}`;
-      
-      // Request OTP
-      await requestOtp(fullPhoneNumber);
+      // Use phone number exactly as user entered it - no processing
+      await requestOtp(data.phoneNumber);
       
       // Navigate to OTP page
       router.push('/otp');
@@ -116,7 +113,6 @@ export default function LoginPage() {
                 placeholder="Input your phone number"
                 InputProps={{
                   inputProps: {
-                    maxLength: 9,
                     onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => {
                       // Allow: backspace, delete, tab, escape, enter, home, end, left, right arrow keys
                       const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'];
@@ -133,8 +129,8 @@ export default function LoginPage() {
                       }
                     },
                     onInput: (e: React.ChangeEvent<HTMLInputElement>) => {
-                      // Only allow numbers, max 9 digits
-                      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 9);
+                      // Only allow numbers, no length restriction
+                      e.target.value = e.target.value.replace(/\D/g, '');
                     },
                   },
                 }}

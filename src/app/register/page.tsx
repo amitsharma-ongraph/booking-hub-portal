@@ -47,8 +47,8 @@ export default function RegisterPage() {
     try {
       clearError();
       
-      // Always prepend +966 for Saudi numbers
-      const fullPhoneNumber = `+966${data.phoneNumber.replace(/\s/g, '')}`;
+      // Always prepend 966 for Saudi numbers (without + sign)
+      const fullPhoneNumber = `966${data.phoneNumber.replace(/\s/g, '')}`;
       
       // Call registration API (termsAccepted is frontend-only validation)
       await register({
@@ -165,7 +165,7 @@ export default function RegisterPage() {
                   <>
                     <Box sx={{ display: 'flex', gap: 0 }}>
                       <TextField
-                        value="+966"
+                        value="966"
                         disabled
                         sx={{
                           width: '60px', // Exact width from SVG
@@ -256,7 +256,6 @@ export default function RegisterPage() {
                           },
                         }}
                         inputProps={{
-                          maxLength: 9,
                           onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => {
                             // Allow: backspace, delete, tab, escape, enter, home, end, left, right arrow keys
                             const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'];
@@ -273,8 +272,8 @@ export default function RegisterPage() {
                             }
                           },
                           onInput: (e: React.ChangeEvent<HTMLInputElement>) => {
-                            // Only allow numbers, max 9 digits
-                            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 9);
+                            // Only allow numbers, no length restriction
+                            e.target.value = e.target.value.replace(/\D/g, '');
                           },
                         }}
                       />

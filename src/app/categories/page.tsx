@@ -49,11 +49,14 @@ export default function CategoriesPage() {
   };
 
   // Fetch categories on mount if not already loaded
+  // Note: The CategoriesContext handles the actual fetching, so we only need to ensure
+  // refreshCategories is called once when the component mounts and user is available
   useEffect(() => {
-    if (user?.id && categories.length === 0 && !isLoading) {
+    if (user?.id && !isLoading) {
       refreshCategories();
     }
-  }, [user?.id, categories.length, isLoading, refreshCategories]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]); // Only depend on user?.id to avoid infinite loops
 
   const handleSaveCategory = async (name: string) => {
     if (!editingCategory) {

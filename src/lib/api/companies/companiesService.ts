@@ -72,7 +72,7 @@ class CompaniesService {
    */
   async getCompaniesByPhone(phoneNumber: string): Promise<CompanyBasicDto[]> {
     const params = new URLSearchParams({
-      service: 'Spa',
+      service: '',
       'phone-number': phoneNumber,
     });
     return this.fetchApi<CompanyBasicDto[]>(`/companies?${params.toString()}`, {

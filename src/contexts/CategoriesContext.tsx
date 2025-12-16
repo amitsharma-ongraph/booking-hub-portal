@@ -39,14 +39,15 @@ export function CategoriesProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentCompanyId, setCurrentCompanyId] = useState<string | null>(null);
+  const [hasFetchedForCompany, setHasFetchedForCompany] = useState<string | null>(null);
 
   /**
    * Fetch categories data by company ID
    * Internal function used by auto-fetch and refresh
    */
-  const fetchCategories = useCallback(async (companyId: string) => {
-    // If we already have categories for this company and no error, don't fetch again
-    if (currentCompanyId === companyId && categories.length > 0 && !error) {
+  const fetchCategories = useCallback(async (companyId: string, forceRefresh = false) => {
+    // If we already fetched for this company ID, don't fetch again (unless explicitly refreshing)
+    if (!forceRefresh && hasFetchedForCompany === companyId && !error) {
       return;
     }
 
@@ -58,25 +59,27 @@ export function CategoriesProvider({ children }: { children: ReactNode }) {
       console.log('📁 Categories data fetched in CategoriesContext:', categoriesData);
       setCategories(categoriesData);
       setCurrentCompanyId(companyId);
+      setHasFetchedForCompany(companyId);
     } catch (err) {
       const apiError = err as ApiError;
       setError(apiError.errorMessage || 'Failed to fetch categories');
       setCategories([]);
+      setHasFetchedForCompany(companyId); // Mark as fetched even on error to prevent infinite loop
     } finally {
       setIsLoading(false);
     }
-  }, [currentCompanyId, categories.length, error]);
+  }, [hasFetchedForCompany, error]);
 
   /**
    * Auto-fetch categories data when user is authenticated
    * Only fetches if:
    * - User is authenticated
    * - User ID (company ID) is available
-   * - Categories data is not already loaded
+   * - We haven't already fetched for this company ID
    * - Not currently loading
    */
   useEffect(() => {
-    if (isAuthenticated && user?.id && categories.length === 0 && !isLoading) {
+    if (isAuthenticated && user?.id && hasFetchedForCompany !== user.id && !isLoading) {
       fetchCategories(user.id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -87,11 +90,12 @@ export function CategoriesProvider({ children }: { children: ReactNode }) {
    * Useful when you need fresh data (e.g., after updates)
    */
   const refreshCategories = useCallback(async () => {
+    // Force refresh by passing forceRefresh = true
     if (currentCompanyId) {
-      await fetchCategories(currentCompanyId);
+      await fetchCategories(currentCompanyId, true);
     } else if (user?.id) {
       // If no currentCompanyId but we have user ID, fetch it
-      await fetchCategories(user.id);
+      await fetchCategories(user.id, true);
     }
   }, [currentCompanyId, user?.id, fetchCategories]);
 
@@ -205,3 +209,4 @@ export function useCategoriesContext() {
   }
   return context;
 }
+

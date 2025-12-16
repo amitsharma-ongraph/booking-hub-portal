@@ -171,6 +171,16 @@ export function useCompanies() {
         };
       }
 
+      // Handle empty categories array gracefully
+      if (company.categories.length === 0) {
+        return {
+          date: filterDate || '',
+          categories: [],
+          availableCategories: [],
+          availableOptions: [],
+        };
+      }
+
       // Helper function to extract date part (YYYY-MM-DD) from ISO string
       const extractDatePart = (isoString: string): string => {
         return isoString.split('T')[0];
@@ -198,8 +208,16 @@ export function useCompanies() {
       }
       
       // Ensure selectedDatePart is a valid string before filtering
+      // Only log error if there are categories but no dates (unexpected scenario)
       if (!selectedDatePart) {
-        console.error('❌ Cannot filter sessions: no valid date selected');
+        // Only log error if we have categories but no dates found (this is unexpected)
+        if (allDateParts.size === 0) {
+          // This is expected when there are no schedules, so we don't log an error
+          // Just return empty data gracefully
+        } else {
+          // This shouldn't happen, but log it for debugging
+          console.warn('⚠️ No valid date selected for filtering sessions');
+        }
         return {
           date: '',
           categories: [],

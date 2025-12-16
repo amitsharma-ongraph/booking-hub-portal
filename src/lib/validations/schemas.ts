@@ -6,8 +6,8 @@ import { z } from 'zod';
  */
 
 // Phone number validation
-// Only accepts Saudi numbers: exactly 9 digits (no + prefix, no country code)
-// Country code +966 will be prepended automatically
+// Only accepts numbers (no + prefix, no country code)
+// Country code 966 will be prepended automatically
 export const phoneSchema = z
   .string()
   .min(1, 'Phone number must be filled')
@@ -18,16 +18,6 @@ export const phoneSchema = z
     },
     {
       message: 'Phone number can only contain numbers',
-    }
-  )
-  .refine(
-    (val) => {
-      // Must be exactly 9 digits (Saudi format)
-      const digits = val.replace(/\D/g, '');
-      return digits.length === 9;
-    },
-    {
-      message: 'Phone number must be exactly 9 digits',
     }
   );
 
