@@ -31,8 +31,8 @@ export default function CategoryOptionCard({
         backgroundColor: '#FFFFFF',
         borderRadius: '8px',
         border: '1px solid #E5E7EB',
-        paddingLeft: '16px',
-        paddingRight: '16px',
+        paddingLeft: { xs: '8px', sm: '16px' },
+        paddingRight: { xs: '8px', sm: '16px' },
       }}
     >
       {/* Option Name - Left Side */}

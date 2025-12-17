@@ -67,15 +67,17 @@ export default function RegisterPage() {
   };
 
   return (
-    <AuthPageLayout>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
-          height: 'auto',
-        }}
-      >
+    <AuthPageLayout cardHeight={{ xs: 'auto', sm: 600 }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        minHeight: '100%',
+      }}
+    >
         {/* Register Heading */}
         <Typography
           variant="h4"
@@ -310,7 +312,7 @@ export default function RegisterPage() {
                       fontWeight: 400,
                       lineHeight: 1.5,
                       marginLeft:"10px"
-                    }}
+                    }} 
                   >
                     I agree with{' '}
                     <Link

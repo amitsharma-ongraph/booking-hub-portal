@@ -18,6 +18,7 @@ import {
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 interface TopBarProps {
   onMenuClick: () => void;
@@ -27,6 +28,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { user } = useAuthContext();
+  const { company } = useCompanyContext();
   const router = useRouter();
   const [mounted, setMounted] = React.useState(false);
   const [imageError, setImageError] = React.useState(false);
@@ -40,28 +42,28 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
     router.push('/profile');
   };
 
-  // Get user name from auth context (only after mount to avoid hydration issues)
-  // CompanyDto uses 'name' instead of firstName/lastName
-  const userName = mounted && user
-    ? user.name || user.emailAddress
-    : '';
+  // Prefer up-to-date company data from CompanyContext, fall back to auth user
+  const rawName = company?.name || user?.name || user?.emailAddress || '';
+  const rawAccountNumber = company?.accountNumber || user?.accountNumber || '';
+  const rawLogo = company?.logo || user?.logo || '';
+
+  // Get user name (only after mount to avoid hydration issues)
+  const userName = mounted ? rawName : '';
   
-  // Get account number from company accountNumber field
-  const accountNumber = mounted && user?.accountNumber 
-    ? `Account #${user.accountNumber}` 
-    : '';
+  // Get account number
+  const accountNumber =
+    mounted && rawAccountNumber ? `Account #${rawAccountNumber}` : '';
   
   // Get profile picture (logo) or fallback to default avatar
-  const profilePicture = mounted && user?.logo && !imageError
-    ? user.logo 
-    : '/images/avatar.svg';
+  const profilePicture =
+    mounted && rawLogo && !imageError ? rawLogo : '/images/avatar.svg';
   
-  // Reset image error when user changes
+  // Reset image error when logo changes
   React.useEffect(() => {
-    if (user?.logo) {
+    if (company?.logo || user?.logo) {
       setImageError(false);
     }
-  }, [user?.logo]);
+  }, [company?.logo, user?.logo]);
 
   return (
     <AppBar

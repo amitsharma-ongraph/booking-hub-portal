@@ -324,9 +324,9 @@ export default function CategoriesPage() {
         <Box
           sx={{
             display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: { xs: 'flex-start', sm: 'center' },
+            justifyContent: { xs: 'flex-start', sm: 'space-between' },
             width: '100%',
             height: { xs: 'auto', sm: '66.77px' },
             minHeight: '66.77px',
@@ -370,12 +370,50 @@ export default function CategoriesPage() {
             startIcon={<AddIcon sx={{ fontSize: '20px' }} />}
             onClick={handleAddCategory}
             sx={{
+              display: { xs: 'none', sm: 'inline-flex' },
               backgroundColor: '#CFA09F',
               color: '#FFFFFF',
               borderRadius: '4px',
               width: { xs: 'auto', sm: '148px' },
               height: '41px',
-              minWidth: '148px',
+              minWidth: { xs: 'auto', sm: '148px' },
+              padding: '0px 16px',
+              fontSize: '14px',
+              fontWeight: 400,
+              textTransform: 'none',
+              boxShadow: 'none',
+              '&:hover': {
+                backgroundColor: '#B8908F',
+                boxShadow: 'none',
+              },
+              '&:active': {
+                backgroundColor: '#A6807F',
+              },
+            }}
+          >
+            Add Category
+          </Button>
+        </Box>
+
+        {/* Add Category Button - Mobile Only (below header) */}
+        <Box
+          sx={{
+            display: { xs: 'flex', sm: 'none' },
+            width: '100%',
+            mb: 2,
+          }}
+        >
+          <Button
+            variant="contained"
+            startIcon={<AddIcon sx={{ fontSize: '20px' }} />}
+            onClick={handleAddCategory}
+            sx={{
+              backgroundColor: '#CFA09F',
+              color: '#FFFFFF',
+              borderRadius: '4px',
+              width: '100%',
+              height: '41px',
+              minWidth: '100%',
               padding: '0px 16px',
               fontSize: '14px',
               fontWeight: 400,
@@ -409,7 +447,7 @@ export default function CategoriesPage() {
             width: '100%',
             borderRadius: '8px',
             backgroundColor: '#FFFFFF',
-            p:'24px'
+            p: { xs: '12px', sm: '24px' }
           }}
         >
           {/* Inner White Card */}
@@ -545,26 +583,7 @@ export default function CategoriesPage() {
                   onDeleteOption={handleDeleteOption}
                 />
               ))
-            ) : (
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  py: 8,
-                }}
-              >
-                <Typography
-                  sx={{
-                    color: '#808080',
-                    fontSize: '14px',
-                    fontWeight: 400,
-                  }}
-                >
-                  No categories available. Click "Add Category" to create one.
-                </Typography>
-              </Box>
-            )}
+            ) : null}
           </Card>
         </Box>
       </Box>

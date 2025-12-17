@@ -99,7 +99,7 @@ export default function OTPPage() {
 
     try {
       clearError();
-      setLocalError(null);
+      setLocalError(null); 
       
       // Verify OTP and get auth token using phone number from storage
       await verifyOtpAndLogin(pendingPhone, data.otp);
@@ -107,8 +107,11 @@ export default function OTPPage() {
       // Fetch basic company info after login
       await fetchBasicCompanyInfo();
       
+      // Decide where to go next based on onboarding flag
+      const shouldShowOnboarding = authStorage.getOnboardingFlag();
+
       // Force full page reload to ensure middleware runs
-      window.location.href = '/onboarding';
+      window.location.href = shouldShowOnboarding ? '/onboarding' : '/';
     } catch (err) {
       const apiError = err as { errorCode?: string; errorMessage?: string };
       const errorMessage =
@@ -157,16 +160,17 @@ export default function OTPPage() {
   }
 
   return (
-    <AuthPageLayout>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: '80%',
-          height: 'auto',
-          position: 'relative',
-        }}
-      >
+    <AuthPageLayout cardHeight={{ xs: 'auto', sm: 600 }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        minHeight: '100%',
+      }}
+    >
         {/* Back Button */}
         <IconButton
           onClick={handleBack}

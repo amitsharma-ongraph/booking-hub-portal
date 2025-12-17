@@ -359,8 +359,8 @@ export default function BookingsPage() {
                 display: 'flex',
                 gap: { xs: '12px', sm: '12px', md: '12px' },
                 flexDirection: { xs: 'column', sm: 'row' },
-                flexWrap: { xs: 'nowrap', sm: 'wrap', md: 'nowrap' },
-                alignItems: { xs: 'stretch', sm: 'flex-start' },
+                flexWrap: { xs: 'nowrap', sm: 'nowrap' },
+                alignItems: { xs: 'stretch', sm: 'stretch' },
                 width: '100%',
               }}
             >
@@ -369,9 +369,9 @@ export default function BookingsPage() {
                 <Box
                   ref={dateInputRef}
                   sx={{
-                    width: { xs: '100%', sm: 'calc(50% - 6px)', md: '255.31px' },
-                    flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 6px)', md: '1 1 auto' },
-                    minWidth: { xs: '100%', sm: 'calc(50% - 6px)', md: '255.31px' },
+                    width: '100%',
+                    flex: { xs: '1 1 100%', sm: '1 1 0' },
+                    minWidth: 0,
                     position: 'relative',
                   }}
                 >
@@ -473,9 +473,9 @@ export default function BookingsPage() {
               {/* All Categories Filter */}
               <FormControl
                 sx={{
-                  width: { xs: '100%', sm: 'calc(50% - 6px)', md: '255.31px' },
-                  flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 6px)', md: '1 1 auto' },
-                  minWidth: { xs: '100%', sm: 'calc(50% - 6px)', md: '255.31px' },
+                  width: '100%',
+                  flex: { xs: '1 1 100%', sm: '1 1 0' },
+                  minWidth: 0,
                 }}
               >
                 <Select
@@ -531,9 +531,9 @@ export default function BookingsPage() {
               {/* Options Filter */}
               <FormControl
                 sx={{
-                  width: { xs: '100%', sm: 'calc(50% - 6px)', md: '255.31px' },
-                  flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 6px)', md: '1 1 auto' },
-                  minWidth: { xs: '100%', sm: 'calc(50% - 6px)', md: '255.31px' },
+                  width: '100%',
+                  flex: { xs: '1 1 100%', sm: '1 1 0' },
+                  minWidth: 0,
                 }}
               >
                 <Select
@@ -593,9 +593,9 @@ export default function BookingsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 sx={{
-                  width: { xs: '100%', sm: 'calc(50% - 6px)', md: '255.31px' },
-                  flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 6px)', md: '1 1 auto' },
-                  minWidth: { xs: '100%', sm: 'calc(50% - 6px)', md: '255.31px' },
+                  width: '100%',
+                  flex: { xs: '1 1 100%', sm: '1 1 0' },
+                  minWidth: 0,
                   '& .MuiOutlinedInput-root': {
                     height: '40px',
                     borderRadius: '8.90263px',
@@ -650,26 +650,7 @@ export default function BookingsPage() {
             >
               <LoadingSpinner text="Loading" />
             </Box>
-          ) : !bookingsData || bookingsData.categories.length === 0 ? (
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                py: 8,
-              }}
-            >
-              <Typography
-                sx={{
-                  fontFamily: 'Roboto',
-                  fontSize: '16px',
-                  color: '#808080',
-                }}
-              >
-                No bookings available for the selected filters.
-              </Typography>
-            </Box>
-          ) : (
+          ) : !bookingsData || bookingsData.categories.length === 0 ? null : (
             bookingsData.categories.map((category) => (
             <CollapsibleCard
               key={category.categoryId}

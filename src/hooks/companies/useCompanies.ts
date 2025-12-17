@@ -207,25 +207,6 @@ export function useCompanies() {
         selectedDatePart = sortedDates[0];
       }
       
-      // Ensure selectedDatePart is a valid string before filtering
-      // Only log error if there are categories but no dates (unexpected scenario)
-      if (!selectedDatePart) {
-        // Only log error if we have categories but no dates found (this is unexpected)
-        if (allDateParts.size === 0) {
-          // This is expected when there are no schedules, so we don't log an error
-          // Just return empty data gracefully
-        } else {
-          // This shouldn't happen, but log it for debugging
-          console.warn('⚠️ No valid date selected for filtering sessions');
-        }
-        return {
-          date: '',
-          categories: [],
-          availableCategories: [],
-          availableOptions: [],
-        };
-      }
-
       // Filter and transform categories with sessions for the selected date
       // First, filter by category if specified
       let filteredCategories = company.categories;

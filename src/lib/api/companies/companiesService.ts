@@ -99,6 +99,17 @@ class CompaniesService {
       body: JSON.stringify(data),
     });
   }
+
+  /**
+   * Create a new company
+   * Uses POST /companies
+   */
+  async createCompany(data: import('./types').CreateCompanyRequestDto): Promise<CompanyDto> {
+    return this.fetchApi<CompanyDto>('/companies', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
 }
 
 export const companiesService = new CompaniesService();

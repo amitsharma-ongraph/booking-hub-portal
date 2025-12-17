@@ -39,7 +39,7 @@ export default function CategoryCard({
         flexDirection: 'column',
         width: '100%',
         mb: 2,
-        p:'10px',
+        p: { xs: '6px', sm: '10px' },
         backgroundColor: '#F5F5F5',
         borderRadius:"17px"
       }}
@@ -177,7 +177,7 @@ export default function CategoryCard({
             display: 'flex',
             flexDirection: 'column',
             gap: 1,
-            p:"12px",
+            p: { xs: '8px', sm: '12px' },
             border:"1px solid #EDEDED",
             borderRadius:"8px"
           }}

@@ -9,7 +9,7 @@ import { companiesService } from '@/lib/api/companies/companiesService';
 import { authStorage } from '@/lib/storage/authStorage';
 import { decodeJwt, isTokenExpired, getUserIdFromToken } from '@/lib/utils/jwt';
 import type { ApiError } from '@/lib/api/client';
-import type { CustomerDto, CustomerCreationDto } from '@/lib/api/auth/types';
+import type { CustomerCreationDto } from '@/lib/api/auth/types';
 import type { CompanyBasicDto } from '@/lib/api/companies/types';
 
 // Basic company info for AuthContext (just what's needed for TopBar)
@@ -202,8 +202,8 @@ export function useAuth() {
   );
 
   /**
-   * Register new user
-   * Note: Registration still uses customer API
+   * Register new user (company owner)
+   * Uses POST /companies instead of customer API
    */
   const register = useCallback(
     async (data: CustomerCreationDto): Promise<BasicCompanyInfo> => {
@@ -211,31 +211,50 @@ export function useAuth() {
       setError(null);
 
       try {
-        const customer = await authService.register(data);
+        const phoneNumber = data.phoneNumber ?? '';
+        const firebaseToken = data.firebaseToken ?? '';
+
+        // Derive company name from registration fields
+        const fullName = `${data.firstName ?? ''} ${data.lastName ?? ''}`.trim();
+        const companyName = fullName || data.emailAddress || phoneNumber;
+
+        // Build POST /companies payload using only register page data
+        const companyRequest: import('@/lib/api/companies/types').CreateCompanyRequestDto = {
+          name: companyName,
+          emailAddress: data.emailAddress,
+          accountNumber: '',
+          location: '',
+          description: '',
+          phoneNumber,
+          logo: '',
+          tiktokUrl: '',
+          instagramUrl: '',
+          whatsappNumber: phoneNumber,
+          bankName: '',
+          firebaseToken,
+          services: [],
+        };
+
+        const company = await companiesService.createCompany(companyRequest);
 
         // Store phone number for OTP flow
-        if (customer.phoneNumber) {
-          authStorage.setPendingPhone(customer.phoneNumber);
+        if (phoneNumber) {
+          authStorage.setPendingPhone(phoneNumber);
         }
 
-        // Try to fetch basic company data if available
-        try {
-          const companies = await companiesService.getCompaniesByPhone(customer.phoneNumber);
-          if (companies.length > 0) {
-            const firstCompany = companies[0];
-            return {
-              id: firstCompany.id,
-              name: firstCompany.name,
-              emailAddress: firstCompany.emailAddress,
-              logo: firstCompany.logo,
-              accountNumber: firstCompany.accountNumber,
-            };
-          }
-        } catch {
-          // If company not found, that's okay - user might not have company yet
-        }
+        // Mark that user should see onboarding on first login after registration
+        authStorage.setOnboardingFlag();
 
-        throw new Error('Company not found. Please contact support.');
+        // Map created company to basic info used across the app
+        const basicInfo: BasicCompanyInfo = {
+          id: company.id,
+          name: company.name,
+          emailAddress: company.emailAddress,
+          logo: company.logo,
+          accountNumber: company.accountNumber,
+        };
+
+        return basicInfo;
       } catch (error) {
         const apiError = error as ApiError;
         const errorMessage =

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { authStorage } from '@/lib/storage/authStorage';
 import SplashScreen from '@/components/onboarding/SplashScreen';
 import OnboardingLayout from '@/components/onboarding/OnboardingLayout';
 import FirstOnboardingScreen from '@/components/onboarding/FirstOnboardingScreen';
@@ -36,6 +37,8 @@ export default function OnboardingPage() {
   };
 
   const handleSkip = () => {
+    // User chose to skip onboarding, don't show again
+    authStorage.removeOnboardingFlag();
     router.push('/');
   };
 
@@ -43,7 +46,8 @@ export default function OnboardingPage() {
     if (currentScreen < ONBOARDING_STEPS.length - 1) {
       setCurrentScreen(currentScreen + 1);
     } else {
-      // After last screen, go to app
+      // After last screen, mark onboarding as completed and go to app
+      authStorage.removeOnboardingFlag();
       router.push('/');
     }
   };

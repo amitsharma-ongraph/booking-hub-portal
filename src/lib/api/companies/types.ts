@@ -117,4 +117,25 @@ export interface UpdateCompanyRequestDto {
   services: string[];
 }
 
+/**
+ * Request DTO for creating a new company
+ * Matches POST /companies request body
+ */
+export interface CreateCompanyRequestDto {
+  name: string;
+  emailAddress: string;
+  accountNumber: string;
+  location: string;
+  description: string;
+  phoneNumber: string;
+  logo: string;
+  tiktokUrl: string;
+  instagramUrl: string;
+  whatsappNumber: string;
+  bankName: string;
+  firebaseToken: string;
+  services: string[];
+}
+
+
 

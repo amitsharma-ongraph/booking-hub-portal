@@ -41,7 +41,7 @@ export default function DashboardPage() {
         {/* Dashboard Stat Cards - Matching SVG Design */}
         <Grid container spacing={3}>
           {/* Card 1 */}
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <Grid size={{ xs: 12, sm: 4, md: 4 }}>
             <DashboardStatCard
               title="Total Bookings"
               icon="/images/icons/bookings-icon.svg"
@@ -50,7 +50,7 @@ export default function DashboardPage() {
           </Grid>
 
           {/* Card 2 */}
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <Grid size={{ xs: 12, sm: 4, md: 4 }}>
             <DashboardStatCard
               title="Active Customers"
               icon="/images/icons/calendar-icon.svg"
@@ -59,7 +59,7 @@ export default function DashboardPage() {
           </Grid>
 
           {/* Card 3 */}
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <Grid size={{ xs: 12, sm: 4, md: 4 }}>
             <DashboardStatCard
               title="Average Rating"
               icon="/images/icons/star.svg"

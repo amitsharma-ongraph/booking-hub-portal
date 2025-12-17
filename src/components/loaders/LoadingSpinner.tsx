@@ -21,21 +21,22 @@ export default function LoadingSpinner({ text = 'Loading', size = 100 }: Loading
   // Radius from center (approximately 40% of size based on SVG)
   const radius = size * 0.4;
   
-  // Define dots with angles (in degrees) and colors matching Figma
+  // Define dots with angles (in degrees) and colors
+  // Colors are reversed so the darkest color is last in the circle sequence
   // Angles start from top (0°) and go clockwise
   const dotConfigs = [
-    { angle: 0, color: '#383A39' },      // Top (12 o'clock)
-    { angle: 30, color: '#77807F' },      // 1 o'clock
-    { angle: 60, color: '#9FAAA9' },      // 2 o'clock
-    { angle: 90, color: '#B2BBBA' },      // Right (3 o'clock)
-    { angle: 120, color: '#C5CCCB' },     // 4 o'clock
-    { angle: 150, color: '#D9DDDD' },     // 5 o'clock
-    { angle: 180, color: '#ECEEEE' },     // Bottom (6 o'clock)
-    { angle: 210, color: '#F2F4F4' },     // 7 o'clock
-    { angle: 240, color: '#F2F7F7' },     // 8 o'clock
-    { angle: 270, color: '#FFFFFF' },     // Left (9 o'clock)
-    { angle: 300, color: '#000000' },      // 10 o'clock
-    { angle: 330, color: '#111111' },     // 11 o'clock
+    { angle: 0, color: '#111111' },      // Top (12 o'clock) - was last
+    { angle: 30, color: '#000000' },     // 1 o'clock
+    { angle: 60, color: '#FFFFFF' },     // 2 o'clock
+    { angle: 90, color: '#F2F7F7' },     // Right (3 o'clock)
+    { angle: 120, color: '#F2F4F4' },    // 4 o'clock
+    { angle: 150, color: '#ECEEEE' },    // 5 o'clock
+    { angle: 180, color: '#D9DDDD' },    // Bottom (6 o'clock)
+    { angle: 210, color: '#C5CCCB' },    // 7 o'clock
+    { angle: 240, color: '#B2BBBA' },    // 8 o'clock
+    { angle: 270, color: '#9FAAA9' },    // Left (9 o'clock)
+    { angle: 300, color: '#77807F' },    // 10 o'clock
+    { angle: 330, color: '#383A39' },    // 11 o'clock - was first
   ];
   
   // Calculate positions for each dot
@@ -71,7 +72,7 @@ export default function LoadingSpinner({ text = 'Loading', size = 100 }: Loading
           width: `${size}px`,
           height: `${size}px`,
           flex: 'none',
-          animation: 'spin 1.2s linear infinite',
+          animation: 'spin 1.8s linear infinite',
           '@keyframes spin': {
             '0%': {
               transform: 'rotate(0deg)',

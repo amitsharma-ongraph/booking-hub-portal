@@ -7,6 +7,7 @@
 const TOKEN_KEY = 'auth_token';
 const USER_KEY = 'auth_user';
 const PENDING_PHONE_KEY = 'pending_phone_number';
+const ONBOARDING_FLAG_KEY = 'onboarding_required';
 
 /**
  * Set cookie helper
@@ -108,6 +109,26 @@ export const authStorage = {
     this.removeToken();
     this.removeUser();
     this.removePendingPhone();
+  },
+  
+  /**
+   * One-time onboarding flag
+   * Used to decide whether to send user to onboarding
+   * right after login (typically after registration).
+   */
+  getOnboardingFlag(): boolean {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem(ONBOARDING_FLAG_KEY) === 'true';
+  },
+
+  setOnboardingFlag(): void {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(ONBOARDING_FLAG_KEY, 'true');
+  },
+
+  removeOnboardingFlag(): void {
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem(ONBOARDING_FLAG_KEY);
   },
 };
 

@@ -192,7 +192,7 @@ export default function CalendarPage() {
             minHeight: '60vh',
           }}
         >
-          <LoadingSpinner text="Loading calendar..." />
+          <LoadingSpinner text="Loading" />
         </Box>
       </MainLayout>
     );
@@ -932,47 +932,7 @@ export default function CalendarPage() {
                           );
                         })}
                       </Box>
-                    ) : (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        minHeight: '300px',
-                        height: '100%',
-                        flex: 1,
-                      }}
-                    >
-                      <EventIcon
-                        sx={{
-                          fontSize: 64,
-                          color: theme.palette.text.disabled,
-                          marginBottom: 2,
-                        }}
-                      />
-                      <Typography
-                        sx={{
-                          fontSize: '18px',
-                          fontWeight: 500,
-                          color: theme.palette.text.secondary,
-                          textAlign: 'center',
-                        }}
-                      >
-                        No events on this date
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontSize: '14px',
-                          color: theme.palette.text.disabled,
-                          textAlign: 'center',
-                          marginTop: 1,
-                        }}
-                      >
-                        {format(new Date(selectedDate + 'T00:00:00'), 'MMMM d, yyyy')}
-                      </Typography>
-                    </Box>
-                    )}
+                    ) : null}
                   </Box>
                 </Box>
               )}
@@ -1196,47 +1156,7 @@ export default function CalendarPage() {
                   );
                 })}
               </Box>
-            ) : (
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  minHeight: '300px',
-                  height: '100%',
-                  flex: 1,
-                }}
-              >
-                <EventIcon
-                  sx={{
-                    fontSize: 64,
-                    color: theme.palette.text.disabled,
-                    marginBottom: 2,
-                  }}
-                />
-                <Typography
-                  sx={{
-                    fontSize: '18px',
-                    fontWeight: 500,
-                    color: theme.palette.text.secondary,
-                    textAlign: 'center',
-                  }}
-                >
-                  No events on this date
-                </Typography>
-                <Typography
-                  sx={{
-                    fontSize: '14px',
-                    color: theme.palette.text.disabled,
-                    textAlign: 'center',
-                    marginTop: 1,
-                  }}
-                >
-                  {format(new Date(selectedDate + 'T00:00:00'), 'MMMM d, yyyy')}
-                </Typography>
-              </Box>
-            )}
+            ) : null}
           </Box>
         )}
       </Drawer>

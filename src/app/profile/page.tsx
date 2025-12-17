@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Box, Typography, CircularProgress, Alert } from '@mui/material';
+import { Box, Typography, Alert } from '@mui/material';
 import MainLayout from '@/components/layout/MainLayout';
 import ProfileTabs from '@/components/profile/ProfileTabs';
 import ProfileTabContent from '@/components/profile/ProfileTabContent';
 import AboutTabContent from '@/components/profile/AboutTabContent';
 import RatingsTabContent from '@/components/profile/RatingsTabContent';
 import { useCompanyContext } from '@/contexts/CompanyContext';
+import LoadingSpinner from '@/components/loaders/LoadingSpinner';
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('profile');
@@ -22,8 +23,16 @@ export default function ProfilePage() {
   const renderTabContent = () => {
     if (isLoading) {
       return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-          <CircularProgress />
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '400px',
+            width: '100%',
+          }}
+        >
+          <LoadingSpinner text="Loading" />
         </Box>
       );
     }
@@ -37,11 +46,7 @@ export default function ProfilePage() {
     }
 
     if (!company) {
-      return (
-        <Alert severity="info" sx={{ mb: 2 }}>
-          No company data available. Please ensure you are logged in.
-        </Alert>
-      );
+      return null;
     }
 
     switch (activeTab) {
