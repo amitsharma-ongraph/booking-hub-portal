@@ -12,6 +12,12 @@ import { useAuthContext } from './AuthContext';
 import type { CompanyDto, UpdateCompanyRequestDto } from '@/lib/api/companies/types';
 import type { ApiError } from '@/lib/api/client';
 
+export interface DashboardData {
+  totalBookings: number;
+  upcomingSchedules: number;
+  averageRating: number;
+}
+
 interface CompanyContextType {
   company: CompanyDto | null;
   isLoading: boolean;
@@ -19,6 +25,7 @@ interface CompanyContextType {
   refreshCompany: () => Promise<void>;
   updateCompany: (data: UpdateCompanyRequestDto) => Promise<void>;
   clearError: () => void;
+  getDashboardData: () => DashboardData;
 }
 
 const CompanyContext = createContext<CompanyContextType | undefined>(undefined);
@@ -133,6 +140,63 @@ export function CompanyProvider({ children }: { children: ReactNode }) {
     setError(null);
   }, []);
 
+  /**
+   * Get dashboard data from company object
+   * Calculates total bookings, upcoming schedules, and average rating
+   */
+  const getDashboardData = useCallback((): DashboardData => {
+    if (!company) {
+      return {
+        totalBookings: 0,
+        upcomingSchedules: 0,
+        averageRating: 0,
+      };
+    }
+
+    // Calculate total bookings
+    const totalBookings = company.bookings?.length || 0;
+
+    // Calculate upcoming schedules
+    // Go through categories -> options -> schedules and count upcoming ones
+    let upcomingSchedules = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of day
+
+    if (company.categories) {
+      company.categories.forEach((category) => {
+        if (category.options) {
+          category.options.forEach((option) => {
+            if (option.schedules) {
+              option.schedules.forEach((schedule) => {
+                // Check if schedule start date is today or in the future
+                const scheduleDate = new Date(schedule.startDate);
+                scheduleDate.setHours(0, 0, 0, 0);
+                if (scheduleDate >= today) {
+                  upcomingSchedules++;
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+
+    // Calculate average rating
+    let averageRating = 0;
+    if (company.ratings && company.ratings.length > 0) {
+      const totalScore = company.ratings.reduce((sum, rating) => sum + (rating.score || 0), 0);
+      averageRating = totalScore / company.ratings.length;
+      // Round to 1 decimal place
+      averageRating = Math.round(averageRating * 10) / 10;
+    }
+
+    return {
+      totalBookings,
+      upcomingSchedules,
+      averageRating,
+    };
+  }, [company]);
+
   return (
     <CompanyContext.Provider
       value={{
@@ -142,6 +206,7 @@ export function CompanyProvider({ children }: { children: ReactNode }) {
         refreshCompany,
         updateCompany,
         clearError,
+        getDashboardData,
       }}
     >
       {children}

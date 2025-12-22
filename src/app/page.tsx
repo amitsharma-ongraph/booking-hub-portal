@@ -1,13 +1,28 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Grid, Typography, Box, useTheme } from '@mui/material';
 import MainLayout from '@/components/layout/MainLayout';
 import DashboardStatCard from '@/components/cards/DashboardStatCard';
 import TodaySchedule from '@/components/dashboard/TodaySchedule';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 export default function DashboardPage() {
   const theme = useTheme();
+  const { getDashboardData } = useCompanyContext();
+  
+  const dashboardData = useMemo(() => getDashboardData(), [getDashboardData]);
+
+  // Format numbers with commas
+  const formatNumber = (num: number): string => {
+    return num.toLocaleString('en-US');
+  };
+
+  // Format rating to 1 decimal place
+  const formatRating = (rating: number): string => {
+    return rating.toFixed(1);
+  };
+
   return (
     <MainLayout>
       <Box sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
@@ -45,16 +60,16 @@ export default function DashboardPage() {
             <DashboardStatCard
               title="Total Bookings"
               icon="/images/icons/bookings-icon.svg"
-              value="1,234"
+              value={formatNumber(dashboardData.totalBookings)}
             />
           </Grid>
 
           {/* Card 2 */}
           <Grid size={{ xs: 12, sm: 4, md: 4 }}>
             <DashboardStatCard
-              title="Active Customers"
+              title="Upcoming Schedules"
               icon="/images/icons/calendar-icon.svg"
-              value="856"
+              value={formatNumber(dashboardData.upcomingSchedules)}
             />
           </Grid>
 
@@ -63,7 +78,7 @@ export default function DashboardPage() {
             <DashboardStatCard
               title="Average Rating"
               icon="/images/icons/star.svg"
-              value="4.5"
+              value={formatRating(dashboardData.averageRating)}
             />
           </Grid>
         </Grid>
