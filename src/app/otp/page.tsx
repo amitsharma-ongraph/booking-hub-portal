@@ -25,7 +25,7 @@ import { authStorage } from '@/lib/storage/authStorage';
 export default function OTPPage() {
   const router = useRouter();
   const theme = useTheme();
-  const { verifyOtpAndLogin, requestOtp, error, clearError, isLoading, fetchBasicCompanyInfo } = useAuthContext();
+  const { verifyOtpAndLogin, requestOtp, error, clearError, isLoading } = useAuthContext();
   const [timer, setTimer] = useState(60);
   const [canResend, setCanResend] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
@@ -102,10 +102,8 @@ export default function OTPPage() {
       setLocalError(null); 
       
       // Verify OTP and get auth token using phone number from storage
+      // This also checks if user is a company user and fetches company info
       await verifyOtpAndLogin(pendingPhone, data.otp);
-      
-      // Fetch basic company info after login
-      await fetchBasicCompanyInfo();
       
       // Decide where to go next based on onboarding flag
       const shouldShowOnboarding = authStorage.getOnboardingFlag();

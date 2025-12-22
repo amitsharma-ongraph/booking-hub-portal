@@ -162,6 +162,7 @@ export function useAuth() {
 
   /**
    * Verify OTP and get auth token
+   * Note: Company existence is checked in login page before OTP request
    */
   const verifyOtpAndLogin = useCallback(
     async (phoneNumber: string, otp: string): Promise<void> => {
@@ -178,11 +179,24 @@ export function useAuth() {
         // Store token
         authStorage.setToken(authResponse.token);
 
-        // Set authenticated state (company data will be fetched separately)
-        setState((prev) => ({
-          ...prev,
-          isAuthenticated: true,
-        }));
+        // Fetch and store company info immediately
+        const companies = await companiesService.getCompaniesByPhone(phoneNumber);
+        if (companies.length > 0) {
+          const firstCompany = companies[0];
+          const basicInfo: BasicCompanyInfo = {
+            id: firstCompany.id,
+            name: firstCompany.name,
+            emailAddress: firstCompany.emailAddress,
+            logo: firstCompany.logo,
+            accountNumber: firstCompany.accountNumber,
+          };
+          authStorage.setUser(basicInfo);
+          setState((prev) => ({
+            ...prev,
+            isAuthenticated: true,
+            user: basicInfo,
+          }));
+        }
 
         // Clear pending phone
         authStorage.removePendingPhone();

@@ -21,6 +21,8 @@ import FormTextField from '@/components/forms/FormTextField';
 import FormButton from '@/components/forms/FormButton';
 import { loginSchema, type LoginFormData } from '@/lib/validations/schemas';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { companiesService } from '@/lib/api/companies/companiesService';
+import type { ApiError } from '@/lib/api/client';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -43,6 +45,22 @@ export default function LoginPage() {
     try {
       clearError();
       setLocalError(null);
+      
+      // Check if company exists for this phone number BEFORE requesting OTP
+      try {
+        const companies = await companiesService.getCompaniesByPhone(data.phoneNumber);
+        if (companies.length === 0) {
+          setLocalError(`Company not found with phone number ${data.phoneNumber}`);
+          return;
+        }
+      } catch (err) {
+        const apiError = err as ApiError;
+        if (apiError.errorCode === 'entity-not-found') {
+          setLocalError(`Company not found with phone number ${data.phoneNumber}`);
+          return;
+        }
+        // If it's a different error, continue to OTP request (might be network issue)
+      }
       
       // Use phone number exactly as user entered it - no processing
       await requestOtp(data.phoneNumber);
