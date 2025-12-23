@@ -31,8 +31,8 @@ export default function CategoryOptionCard({
         backgroundColor: '#FFFFFF',
         borderRadius: '8px',
         border: '1px solid #E5E7EB',
-        paddingLeft: { xs: '8px', sm: '16px' },
-        paddingRight: { xs: '8px', sm: '16px' },
+        paddingLeft: { xs: '6px', sm: '16px' },
+        paddingRight: { xs: '6px', sm: '16px' },
       }}
     >
       {/* Option Name - Left Side */}
@@ -45,7 +45,7 @@ export default function CategoryOptionCard({
         <Typography
           sx={{
             color: '#0A0A0A',
-            fontSize: '14px',
+            fontSize: { xs: '12px', sm: '14px' },
             fontWeight: 400,
             lineHeight: 1.2,
           }}
@@ -66,10 +66,10 @@ export default function CategoryOptionCard({
         <Typography
           sx={{
             color: '#CFA09F',
-            fontSize: '14px',
+            fontSize: { xs: '12px', sm: '14px' },
             fontWeight: 400,
             lineHeight: 1.2,
-            marginRight: '8px',
+            marginRight: { xs: '4px', sm: '8px' },
           }}
         >
           {price} ﷼

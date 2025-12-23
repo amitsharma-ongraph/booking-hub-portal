@@ -39,7 +39,7 @@ export default function CategoryCard({
         flexDirection: 'column',
         width: '100%',
         mb: 2,
-        p: { xs: '6px', sm: '10px' },
+        p: { xs: '4px', sm: '10px' },
         backgroundColor: '#F5F5F5',
         borderRadius:"17px"
       }}
@@ -64,7 +64,7 @@ export default function CategoryCard({
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
-            px: 2,
+            px: { xs: 1, sm: 2 },
           }}
         >
           {/* Category Name - Left */}
@@ -77,7 +77,7 @@ export default function CategoryCard({
             <Typography
               sx={{
                 color: '#0A0A0A',
-                fontSize: '16px',
+                fontSize: { xs: '14px', sm: '16px' },
                 fontWeight: 700,
                 lineHeight: 1.2,
               }}
@@ -96,7 +96,7 @@ export default function CategoryCard({
             <Typography
               sx={{
                 color: '#0A0A0A',
-                fontSize: '16px',
+                fontSize: { xs: '14px', sm: '16px' },
                 fontWeight: 400,
                 lineHeight: 1.2,
               }}
@@ -114,7 +114,7 @@ export default function CategoryCard({
             alignItems: 'center',
             justifyContent: 'flex-end',
             gap: 1,
-            px: 2,
+            px: { xs: 1, sm: 2 },
           }}
         >
           {/* Edit Button */}
@@ -177,7 +177,7 @@ export default function CategoryCard({
             display: 'flex',
             flexDirection: 'column',
             gap: 1,
-            p: { xs: '8px', sm: '12px' },
+            p: { xs: '6px', sm: '12px' },
             border:"1px solid #EDEDED",
             borderRadius:"8px"
           }}

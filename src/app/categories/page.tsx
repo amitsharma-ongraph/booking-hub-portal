@@ -483,8 +483,8 @@ export default function CategoriesPage() {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   height: '44.51px',
-                  paddingLeft: '8.9px',
-                  paddingRight: '8.9px',
+                  paddingLeft: { xs: '6px', sm: '8.9px' },
+                  paddingRight: { xs: '6px', sm: '8.9px' },
                 }}
               >
                 {/* Category Name - Left */}
@@ -499,12 +499,12 @@ export default function CategoriesPage() {
                       fontFamily: 'Roboto',
                       fontStyle: 'normal',
                       fontWeight: 400,
-                      fontSize: '15.5796px',
+                      fontSize: { xs: '13px', sm: '15.5796px' },
                       lineHeight: '22px',
                       color: '#808080',
                     }}
                   >
-                    Category Name
+                    Name
                   </Typography>
                 </Box>
 
@@ -520,7 +520,7 @@ export default function CategoriesPage() {
                       fontFamily: 'Roboto',
                       fontStyle: 'normal',
                       fontWeight: 400,
-                      fontSize: '15.5796px',
+                      fontSize: { xs: '13px', sm: '15.5796px' },
                       lineHeight: '22px',
                       color: '#808080',
                     }}
@@ -539,8 +539,8 @@ export default function CategoriesPage() {
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  paddingLeft: '8.9px',
-                  paddingRight: '8.9px',
+                  paddingLeft: { xs: '6px', sm: '8.9px' },
+                  paddingRight: { xs: '6px', sm: '8.9px' },
                 }}
               >
                 <Typography
@@ -548,7 +548,7 @@ export default function CategoriesPage() {
                     fontFamily: 'Roboto',
                     fontStyle: 'normal',
                     fontWeight: 400,
-                    fontSize: '15.5796px',
+                    fontSize: { xs: '13px', sm: '15.5796px' },
                     lineHeight: '22px',
                     color: '#808080',
                   }}

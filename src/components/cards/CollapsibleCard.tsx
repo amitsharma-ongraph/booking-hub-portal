@@ -50,7 +50,7 @@ export default function CollapsibleCard({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-start',
-        padding: '16px',
+        padding: { xs: '10px', sm: '16px' },
         gap: '10px',
         width: '100%',
         maxWidth: '100%',
@@ -66,111 +66,109 @@ export default function CollapsibleCard({
       <Box
         sx={{
           display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          flexDirection: 'column',
           padding: 0,
-          gap: { xs: 2, sm: 4 },
+          gap: '8px',
           width: '100%',
-          minHeight: '50px',
           flex: 'none',
         }}
       >
-        {/* Left Side: Title and Label-Value Pairs */}
+        {/* First Row: Title and Dropdown Button */}
         <Box
           sx={{
             display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
             padding: 0,
-            gap: '4px',
-            flex: 1,
-            minWidth: 0,
+            width: '100%',
+            gap: { xs: 1, sm: 2 },
           }}
         >
-          {/* Title */}
+          {/* Title - Left */}
           <Typography
             sx={{
               fontFamily: 'Roboto',
               fontStyle: 'normal',
               fontWeight: 700,
-              fontSize: '18px',
+              fontSize: { xs: '16px', sm: '18px' },
               lineHeight: '22px',
               color: headingColor,
-              flex: 'none',
-              width: '100%',
+              flex: 1,
+              minWidth: 0,
             }}
           >
             {title}
           </Typography>
 
-          {/* Label-Value Pairs Row */}
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              padding: 0,
-              gap: '12px',
-              width: '100%',
-              flexWrap: 'wrap',
-            }}
-          >
-            {labelValuePairs.map((pair, index) => (
-              <React.Fragment key={index}>
-                <Typography
-                  sx={{
-                    fontFamily: 'Roboto',
-                    fontStyle: 'normal',
-                    fontWeight: 400,
-                    fontSize: '14px',
-                    lineHeight: '22px',
-                    color: '#808080',
-                    flex: 'none',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {pair}
-                </Typography>
-                {index < labelValuePairs.length - 1 && (
-                  <Box
-                    component="span"
-                    sx={{
-                      width: '1px',
-                      height: '23px',
-                      backgroundColor: '#808080',
-                      flex: 'none',
-                    }}
-                  />
-                )}
-              </React.Fragment>
-            ))}
-          </Box>
-        </Box>
-
-        {/* Right Side: Chevron Icon */}
-        <IconButton
-          onClick={handleToggle}
-          sx={{
-            width: '24px',
-            height: '24px',
-            padding: 0,
-            flex: 'none',
-            transition: 'transform 0.3s ease',
-            transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
-            '&:hover': {
-              backgroundColor: 'transparent',
-            },
-          }}
-        >
-          <KeyboardArrowDown
+          {/* Dropdown Button - Right */}
+          <IconButton
+            onClick={handleToggle}
             sx={{
               width: '24px',
               height: '24px',
-              color: '#000000',
+              padding: 0,
+              flex: 'none',
+              flexShrink: 0,
+              transition: 'transform 0.3s ease',
+              transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+              '&:hover': {
+                backgroundColor: 'transparent',
+              },
             }}
-          />
-        </IconButton>
+          >
+            <KeyboardArrowDown
+              sx={{
+                width: '24px',
+                height: '24px',
+                color: '#000000',
+              }}
+            />
+          </IconButton>
+        </Box>
+
+        {/* Second Row: Label-Value Pairs */}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            padding: 0,
+              gap: { xs: '8px', sm: '12px' },
+            width: '100%',
+            flexWrap: 'wrap',
+          }}
+        >
+          {labelValuePairs.map((pair, index) => (
+            <React.Fragment key={index}>
+              <Typography
+                sx={{
+                  fontFamily: 'Roboto',
+                  fontStyle: 'normal',
+                  fontWeight: 400,
+                  fontSize: { xs: '12px', sm: '14px' },
+                  lineHeight: '22px',
+                  color: '#808080',
+                  flex: 'none',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {pair}
+              </Typography>
+              {index < labelValuePairs.length - 1 && (
+                <Box
+                  component="span"
+                  sx={{
+                    width: '1px',
+                    height: '23px',
+                    backgroundColor: '#808080',
+                    flex: 'none',
+                  }}
+                />
+              )}
+            </React.Fragment>
+          ))}
+        </Box>
       </Box>
 
       {/* Expandable Content */}
@@ -188,7 +186,7 @@ export default function CollapsibleCard({
             sx={{
               width: '100%',
               maxWidth: '100%',
-              paddingTop: '10px',
+              paddingTop: { xs: '8px', sm: '10px' },
               background: isPrimary ? '#FFFFFF' : '#F3F3F5',
               boxSizing: 'border-box',
               display: 'flex',

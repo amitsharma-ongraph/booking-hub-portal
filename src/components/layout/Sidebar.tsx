@@ -5,6 +5,7 @@ import {
   Drawer,
   List,
   Box,
+  Typography,
   useTheme as useMuiTheme,
   useMediaQuery,
 } from '@mui/material';
@@ -12,6 +13,8 @@ import Image from 'next/image';
 import { Logout as LogoutIcon } from '@mui/icons-material';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 import SidebarMenuItem, { SidebarMenuItemProps } from './SidebarMenuItem';
 
 const drawerWidth = 285; // Match SVG width
@@ -59,6 +62,24 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { user } = useAuthContext();
+  const { company } = useCompanyContext();
+  const [mounted, setMounted] = React.useState(false);
+
+  // Handle client-side only rendering to avoid hydration mismatch
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Get merchant name - prefer company context, fall back to auth user
+  const rawMerchantName = mounted ? (company?.name || user?.name || '') : '';
+  // Capitalize first letter of merchant name (title case)
+  const merchantName = rawMerchantName 
+    ? rawMerchantName
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ')
+    : '';
 
   const handleNavigation = (path: string) => {
     // For protected routes, ensure middleware runs by checking if we need full reload
@@ -83,8 +104,12 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
         sx={{
           height: '80px',
           display: 'flex',
+          flexDirection: 'row',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'flex-start',
+          gap: 1.5,
+          px: 2,
+          ml: 1, // Match List padding to align with menu items
         }}
       >
         <Box
@@ -92,6 +117,7 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
             width: 40,
             height: 40,
             position: 'relative',
+            flexShrink: 0,
           }}
         >
           <Image
@@ -108,6 +134,23 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
             sizes="40px"
           />
         </Box>
+        {mounted && merchantName && (
+          <Typography
+            variant="body2"
+            sx={{
+              color: theme.palette.primary.main,
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              lineHeight: 1.4,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              maxWidth: '100%',
+            }}
+          >
+            Hello {merchantName}
+          </Typography>
+        )}
       </Box>
 
       {/* Divider */}

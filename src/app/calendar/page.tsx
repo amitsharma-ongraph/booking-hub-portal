@@ -435,9 +435,10 @@ export default function CalendarPage() {
                   >
                   <Typography
                     sx={{
-                      fontSize: '32px',
+                      fontSize: { xs: '20px', sm: '24px', md: '32px' },
                       fontWeight: 400,
                       color: theme.palette.text.primary,
+                      whiteSpace: 'nowrap',
                     }}
                   >
                     {format(currentMonth, 'MMMM yyyy')}
